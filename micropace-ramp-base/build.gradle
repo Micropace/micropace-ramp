@@ -1,0 +1,44 @@
+group 'micropace-ramp'
+version '1.0.0'
+
+buildscript {
+    ext {
+        springbootVersion   = '1.5.10.RELEASE'
+        jacksonVersion      = '2.9.5'
+    }
+    repositories {
+        mavenCentral()
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springbootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
+}
+
+dependencies {
+    compile "org.springframework.boot:spring-boot-starter:${springbootVersion}"
+    compile 'org.projectlombok:lombok:1.16.20'
+    // mybatis-plus 支持
+    compile 'com.baomidou:mybatis-plus-boot-starter:2.2.0'
+    //jackson
+    compile "com.fasterxml.jackson.core:jackson-core:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
+    compile "com.fasterxml.jackson.core:jackson-annotations:${jacksonVersion}"
+}
+
+jar {
+    baseName = "micropace-ramp-base"
+    manifest{
+        attributes 'Manifest-Version': '1.0'
+    }
+}

@@ -1,0 +1,80 @@
+server:
+  port: 9980
+
+logging:
+  pattern.console: '%d{yyyy-MM-dd HH:mm:ss} %clr(${LOG_LEVEL_PATTERN:-%5p-}) %clr([%18.18t]){magenta} %clr(%-40.40logger{40}){blue} : %m%n'
+
+spring:
+  # 选择配置环境
+  profiles:
+    active: dev
+  # 热部署
+  devtools:
+    restart:
+      enabled: false
+
+  datasource:
+    name: ramp
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    filters: stat
+    maxActive: 20
+    initialSize: 1
+    minIdle: 1
+    # 获取连接时最大等待时间，单位毫秒
+    maxWait: 10000
+    # 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒
+    timeBetweenEvictionRunsMillis: 60000
+    # 配置一个连接在池中最小生存的时间，单位是毫秒
+    minEvictableIdleTimeMillis: 300000
+    # 关闭PSCache缓存, Mysql不支持游标
+    poolPreparedStatements: false
+    # 申请连接时检测连接是否有效
+    validationQuery: select 'x'
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+
+  # 文件上传路径配置
+  mvc:
+    static-path-pattern: /**
+  resources:
+    # 将upload.path backup.path 加入静态资源
+    static-locations: /META-INF/resources/,classpath:/resources/,classpath:/static/,classpath:/public/,file:${upload.path}
+  # 文件上传大小限制
+  http:
+    multipart:
+      maxFileSize: 1000Mb
+  # redis 配置
+  redis:
+    timeout: 0
+    pool:
+      max-active: 200
+      max-wait: -1
+      max-idle: 8
+      min-idle: 0
+
+# mybatis 配置
+mybatis-plus:
+  mapper-locations: classpath:/mapper/*Mapper.xml
+  #实体扫描，多个package用逗号或者分号分隔
+  typeAliasesPackage: com.micropace.entity
+  global-config:
+    #主键类型  0:"数据库ID自增", 1:"用户输入ID",2:"全局唯一ID (数字类型唯一ID)", 3:"全局唯一ID UUID";
+    id-type: 2
+    #字段策略 0:"忽略判断",1:"非 NULL 判断"),2:"非空判断"
+    field-strategy: 2
+    #驼峰下划线转换
+    db-column-underline: true
+    #数据库大写下划线转换
+    capital-mode: true
+    #逻辑删除配置（下面3个配置）
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+    # SQL 解析缓存，开启后多租户 @SqlParser 注解生效
+    sql-parser-cache: true
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false
+
+
