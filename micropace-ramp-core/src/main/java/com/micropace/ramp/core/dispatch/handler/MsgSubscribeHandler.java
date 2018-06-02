@@ -1,7 +1,7 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;
-import com.micropace.ramp.core.handler.builder.TextBuilder;
+import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
 import com.micropace.ramp.base.entity.*;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.core.service.*;
@@ -26,7 +26,7 @@ import java.util.Map;
  * @author Suffrajet
  */
 @Component
-public class SubscribeHandler extends AbstractHandler {
+public class MsgSubscribeHandler extends AbstractHandler {
 
     @Autowired
     private IWxAppService iWxAppService;
@@ -58,7 +58,7 @@ public class SubscribeHandler extends AbstractHandler {
 
         // TODO 通用关注回复消息
         try {
-            return new TextBuilder().build("感谢关注", wxMessage, weixinService);
+            return new ReplyTextBuilder().build("感谢关注", wxMessage, weixinService);
         } catch (Exception e) {
             this.logger.error(e.getMessage(), e);
         }
@@ -83,45 +83,45 @@ public class SubscribeHandler extends AbstractHandler {
                 if (wxApp != null) {
                     // B类型公众号的用户
                     if(WxAppCategoryEnum.TYPE_B.getCode().equals(wxApp.getCategory())) {
-                        BUser BUser = IBUserService.selectByOpenid(wxApp.getId(), openid);
-                        if(BUser == null) {
-                            BUser = new BUser();
-                            BUser.setOpenid(openid);
-                            BUser.setUnionid(userWxInfo.getUnionId());
-                            BUser.setIdWxApp(wxApp.getId());
-                            BUser.setStatus(RegisterStatusEnum.DEFAULT.getCode());
-                            this.fillLord(BUser, userWxInfo);
-                            if(IBUserService.insert(BUser)) {
+                        BUser bUser = IBUserService.selectByOpenid(wxApp.getId(), openid);
+                        if(bUser == null) {
+                            bUser = new BUser();
+                            bUser.setOpenid(openid);
+                            bUser.setUnionid(userWxInfo.getUnionId());
+                            bUser.setIdWxApp(wxApp.getId());
+                            bUser.setStatus(RegisterStatusEnum.DEFAULT.getCode());
+                            this.fillBUser(bUser, userWxInfo);
+                            if(IBUserService.insert(bUser)) {
                                 logger.info("Create B user: {} success", userWxInfo.getNickname());
                             }
                         } else {
-                            this.fillLord(BUser, userWxInfo);
-                            BUser.setIsDeleted(0);
-                            if(IBUserService.updateById(BUser)) {
+                            this.fillBUser(bUser, userWxInfo);
+                            bUser.setIsDeleted(0);
+                            if(IBUserService.updateById(bUser)) {
                                 logger.info("Active B user: {}", userWxInfo.getNickname());
                             }
                         }
                     }
                     // C类型公众号的用户
                     if(WxAppCategoryEnum.TYPE_C.getCode().equals(wxApp.getCategory())) {
-                        CUser fans = ICUserService.selectByOpenid(wxApp.getId(), openid);
-                        if(fans == null) {
-                            fans = new CUser();
-                            fans.setOpenid(openid);
-                            fans.setUnionid(userWxInfo.getUnionId());
-                            fans.setIdWxApp(wxApp.getId());
-                            this.fillFans(fans, userWxInfo);
-                            if(ICUserService.insert(fans)) {
+                        CUser cUser = ICUserService.selectByOpenid(wxApp.getId(), openid);
+                        if(cUser == null) {
+                            cUser = new CUser();
+                            cUser.setOpenid(openid);
+                            cUser.setUnionid(userWxInfo.getUnionId());
+                            cUser.setIdWxApp(wxApp.getId());
+                            this.fillCUser(cUser, userWxInfo);
+                            if(ICUserService.insert(cUser)) {
                                 logger.info("Create C user: {} success", userWxInfo.getNickname());
                             }
                         } else {
-                            this.fillFans(fans, userWxInfo);
-                            fans.setIsDeleted(0);
-                            if(ICUserService.updateById(fans)) {
+                            this.fillCUser(cUser, userWxInfo);
+                            cUser.setIsDeleted(0);
+                            if(ICUserService.updateById(cUser)) {
                                 logger.info("Active C user: {}", userWxInfo.getNickname());
                             }
                         }
-                        reply = this.bindUser2Lord(wxApp, fans, wxMessage, weixinService);
+                        reply = this.bindUser2Lord(wxApp, cUser, wxMessage, weixinService);
                     }
                 }
             } catch (Exception e) {
@@ -147,7 +147,7 @@ public class SubscribeHandler extends AbstractHandler {
             try {
                 if (iRelationService.followBUser(fans, wxApp.getWxId(), sceneStr)) {
                     // TODO 关注B用户的回复消息
-                    reply = new TextBuilder().build("感谢扫码关注", wxMessage, weixinService);
+                    reply = new ReplyTextBuilder().build("感谢扫码关注", wxMessage, weixinService);
                 }
             } catch (Exception e) {
                 logger.error(e.getMessage(), e);
@@ -156,21 +156,21 @@ public class SubscribeHandler extends AbstractHandler {
         return reply;
     }
 
-    private void fillLord(BUser BUser, WxMpUser userWxInfo) {
-        BUser.setNickname(userWxInfo.getNickname());
-        BUser.setSex(userWxInfo.getSex());
-        BUser.setCountry(userWxInfo.getCountry());
-        BUser.setProvince(userWxInfo.getProvince());
-        BUser.setCity(userWxInfo.getCity());
-        BUser.setAvatar(userWxInfo.getHeadImgUrl());
+    private void fillBUser(BUser bUser, WxMpUser userWxInfo) {
+        bUser.setNickname(userWxInfo.getNickname());
+        bUser.setSex(userWxInfo.getSex());
+        bUser.setCountry(userWxInfo.getCountry());
+        bUser.setProvince(userWxInfo.getProvince());
+        bUser.setCity(userWxInfo.getCity());
+        bUser.setAvatar(userWxInfo.getHeadImgUrl());
     }
 
-    private void fillFans(CUser fans, WxMpUser userWxInfo) {
-        fans.setNickname(userWxInfo.getNickname());
-        fans.setSex(userWxInfo.getSex());
-        fans.setCountry(userWxInfo.getCountry());
-        fans.setProvince(userWxInfo.getProvince());
-        fans.setCity(userWxInfo.getCity());
-        fans.setAvatar(userWxInfo.getHeadImgUrl());
+    private void fillCUser(CUser cUser, WxMpUser userWxInfo) {
+        cUser.setNickname(userWxInfo.getNickname());
+        cUser.setSex(userWxInfo.getSex());
+        cUser.setCountry(userWxInfo.getCountry());
+        cUser.setProvince(userWxInfo.getProvince());
+        cUser.setCity(userWxInfo.getCity());
+        cUser.setAvatar(userWxInfo.getHeadImgUrl());
     }
 }

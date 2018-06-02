@@ -1,6 +1,6 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
-import com.micropace.ramp.core.handler.builder.TextBuilder;
+import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
 import me.chanjar.weixin.common.session.WxSessionManager;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -12,7 +12,7 @@ import java.util.Map;
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
 @Component
-public class LocationHandler extends AbstractHandler {
+public class MsgLocationHandler extends AbstractHandler {
 
     @Override
     public WxMpXmlOutMessage handle(WxMpXmlMessage wxMessage,
@@ -22,7 +22,7 @@ public class LocationHandler extends AbstractHandler {
             //TODO 接收处理用户发送的地理位置消息
             try {
                 String content = "感谢反馈，您的的地理位置已收到！";
-                return new TextBuilder().build(content, wxMessage, null);
+                return new ReplyTextBuilder().build(content, wxMessage, null);
             } catch (Exception e) {
                 this.logger.error("位置消息接收处理失败", e);
                 return null;

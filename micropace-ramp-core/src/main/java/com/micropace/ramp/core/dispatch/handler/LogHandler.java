@@ -1,4 +1,4 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
 import com.micropace.ramp.core.util.JsonUtils;
 import me.chanjar.weixin.common.session.WxSessionManager;

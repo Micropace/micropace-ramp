@@ -1,6 +1,6 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
-import com.micropace.ramp.core.handler.builder.TextBuilder;
+import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
 import com.micropace.ramp.core.service.IBUserRegistService;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -16,7 +16,7 @@ import java.util.Map;
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType;
 
 @Component
-public class MsgHandler extends AbstractHandler {
+public class MsgTextHandler extends AbstractHandler {
 
     @Autowired
     private IBUserRegistService ibUserRegistService;
@@ -55,7 +55,7 @@ public class MsgHandler extends AbstractHandler {
 
         //TODO 组装回复消息
         String content = "收到文本消息：" + text;
-        return new TextBuilder().build(content, wxMessage, weixinService);
+        return new ReplyTextBuilder().build(content, wxMessage, weixinService);
     }
 
 }

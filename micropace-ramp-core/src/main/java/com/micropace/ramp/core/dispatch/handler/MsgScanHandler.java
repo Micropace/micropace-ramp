@@ -1,6 +1,6 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
-import com.micropace.ramp.core.handler.builder.TextBuilder;
+import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
 import com.micropace.ramp.base.entity.CUser;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.core.service.ICUserService;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class ScanHandler extends AbstractHandler {
+public class MsgScanHandler extends AbstractHandler {
 
     @Autowired
     private IWxAppService iWxAppService;
@@ -44,7 +44,7 @@ public class ScanHandler extends AbstractHandler {
                 if(fans != null) {
                     if (iRelationService.followBUser(fans, wxApp.getWxId(), sceneStr)) {
                         logger.info("Create fans {} relation", fans.getNickname());
-                        return new TextBuilder().build("扫码事件, 场景值: " + wxMessage.getEventKey(), wxMessage, weixinService);
+                        return new ReplyTextBuilder().build("扫码事件, 场景值: " + wxMessage.getEventKey(), wxMessage, weixinService);
                     }
                 }
             }

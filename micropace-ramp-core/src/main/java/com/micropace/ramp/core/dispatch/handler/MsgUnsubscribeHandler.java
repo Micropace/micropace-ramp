@@ -1,4 +1,4 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.Map;
 
 @Component
-public class UnsubscribeHandler extends AbstractHandler {
+public class MsgUnsubscribeHandler extends AbstractHandler {
 
     @Autowired
     private IWxAppService iWxAppService;
