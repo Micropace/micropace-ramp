@@ -33,7 +33,7 @@ public class Session {
      */
     private int currentStep;
     /** 会话每个步骤的内容记录 */
-    private Map<Long, Object> contents;
+    private Map<Long, String> contents;
 
     public Session() {}
 
@@ -57,7 +57,7 @@ public class Session {
      *
      * @param stepContent 最新一步的会话内容
      */
-    public void next(Object stepContent) {
+    public void next(String stepContent) {
         this.currentStep += 1;
         if(this.stepCount > 0) {
             if(stepContent != null) {
@@ -78,7 +78,7 @@ public class Session {
      * @param step 指定会话步骤
      * @return Object
      */
-    public Object getStepContent(int step) {
+    public String getStepContent(int step) {
         return this.contents.get(Long.parseLong(String.valueOf(step)));
     }
 

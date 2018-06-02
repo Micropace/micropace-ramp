@@ -133,9 +133,9 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
             Session session = redisManager.helper().getObj(key, Session.class);
             if (session != null) {
                 // 取出会话中存储的手机号
-                String mobile   = (String) session.getStepContent(2);
+                String mobile   = session.getStepContent(2);
                 // 取出会话中存储的验证码
-                String thatCode = (String) session.getStepContent(3);
+                String thatCode = session.getStepContent(3);
 
                 // 验证码输入错误
                 if (!validateCode.equals(thatCode)) {

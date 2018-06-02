@@ -1,18 +1,17 @@
 package com.micropace.ramp.core.service;
 
 /**
- * B用户注册相关接口
+ * B用户注册过程会话接口
  *
  * @author Suffrajet
  */
 public interface IBUserRegistService {
 
-    /**
-     * 注册会话过期时间 5分钟
-     */
+    /** 注册会话过期时间 5分钟 */
     int SESSION_EXPIRE = 5 * 60;
+
     /** 用户重复申请注册 */
-    String REPLY_REGISTER_APPLY_REPEAT = "您已注册过";
+    String REPLY_REGISTER_APPLY_REPEAT = "您的注册申请已审核通过，请勿重复注册";
     /** 用户已开启注册会话 */
     String REPLY_REGISTER_SESSION_STARTED = "您已发送过注册命令，请输入您的手机号，点击“发送”";
     /** 用户申请注册成功 */
