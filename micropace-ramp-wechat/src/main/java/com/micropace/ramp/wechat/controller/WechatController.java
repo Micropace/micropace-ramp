@@ -1,18 +1,28 @@
-package com.micropace.ramp.wechat.controller.wechat;
+package com.micropace.ramp.wechat.controller;
 
+import com.micropace.ramp.base.common.BaseController;
+import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxTypeEnum;
-import com.micropace.ramp.core.GlobalParamCache;
+import com.micropace.ramp.core.GlobalParamManager;
+import me.chanjar.weixin.common.api.WxConsts;
+import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import me.chanjar.weixin.mp.bean.result.WxMpOAuth2AccessToken;
+import me.chanjar.weixin.mp.bean.result.WxMpUser;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * 微信公众号认证接口
@@ -21,11 +31,15 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/service")
-public class WechatController {
+public class WechatController extends BaseController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private GlobalParamCache globalCache;
+    private GlobalParamManager globalParamManager;
+
+    /** 自定义配置域名，www.name.com */
+    @Value("${server.domain}")
+    private String serverDomain;
 
     /**
      * 微信服务器认证, url中需自带wxId字段，该字段是公众号的原始ID
@@ -49,12 +63,12 @@ public class WechatController {
             throw new IllegalArgumentException("illegal params");
         }
 
-        WxApp wxApp = globalCache.getWxApp(wxId);
+        WxApp wxApp = globalParamManager.getWxApp(wxId);
         if (wxApp != null) {
             // 服务号和订阅号的验证处理
             if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
                     || WxTypeEnum.APP_SERVICE.getCode().equals(wxApp.getWxType())) {
-                WxMpService wxMpService = globalCache.getMpService(wxId);
+                WxMpService wxMpService = globalParamManager.getMpService(wxId);
                 if (wxMpService != null) {
                     if (wxMpService.checkSignature(timestamp, nonce, signature)) {
                         return echostr;
@@ -63,7 +77,7 @@ public class WechatController {
             }
             // 企业号的验证处理
             if (WxTypeEnum.APP_ENTERPRISE.getCode().equals(wxApp.getWxType())) {
-                WxCpService wxCpService = globalCache.getCpService(wxId);
+                WxCpService wxCpService = globalParamManager.getCpService(wxId);
                 if (wxCpService != null) {
                     if (wxCpService.checkSignature(timestamp, nonce, signature, echostr)) {
                         return echostr;
@@ -100,7 +114,7 @@ public class WechatController {
                         + " timestamp=[{}], nonce=[{}], requestBody=[\n{}] ",
                 signature, encType, msgSignature, timestamp, nonce, requestBody);
 
-        WxApp wxApp = globalCache.getWxApp(wxId);
+        WxApp wxApp = globalParamManager.getWxApp(wxId);
         if (wxApp != null) {
             // 服务号和订阅号的消息路由
             if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
@@ -115,9 +129,76 @@ public class WechatController {
         return null;
     }
 
+    /**
+     *
+     * 前端首页入口，跳转到网页授权URL
+     *
+     * <p>
+     *     url: http://host/api/service/oauth/login
+     *     param: wxId=xxxxx
+     * </p>
+     * <p>
+     *     callback: http:host/api/service/oauth/callback
+     *     param: code=xxxx, state=xxxxx
+     * </p>
+     *
+     * 其中，wxId必须配置，是作为识别公众号的标识
+     * 为了在回调接口中识别公众号，将state设置为wxId的值
+     *
+     * @param wxId 公众号原始ID
+     * @param response void 将会发起Oauth2请求。
+     */
+    @GetMapping("/oauth/login")
+    public void index(@RequestParam("wxId") String wxId,
+                      HttpServletResponse response) {
+        WxApp wxApp = globalParamManager.getWxApp(wxId);
+        if (wxApp != null) {
+            WxMpService wxMpService = globalParamManager.getMpService(wxId);
+            if (wxMpService != null) {
+                String redirectUri = String.format("http://%s/api/service/oauth/callback", serverDomain);
+                String url = wxMpService.oauth2buildAuthorizationUrl(redirectUri, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
+                try {
+                    response.sendRedirect(url);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    /**
+     *
+     * 网页授权回调接口
+     *
+     *  @param code Oauth接口返回的code值
+     * @param state 自定义state参数，约定state为公众号的原始ID，以识别公众号
+     * @return 授权后的用户信息
+     */
+    @GetMapping("/oauth/callback")
+    public ResponseMsg oauthCallback(@RequestParam("code") String code,
+                                     @RequestParam("state") String state) {
+        WxMpService wxMpService = globalParamManager.getMpService(state);
+        if (wxMpService != null) {
+            try {
+                WxMpOAuth2AccessToken accessToken = wxMpService.oauth2getAccessToken(code);
+                WxMpUser wxMpUser = wxMpService.oauth2getUserInfo(accessToken, null);
+                return success(wxMpUser);
+
+            } catch (WxErrorException e) {
+                e.printStackTrace();
+            }
+
+            // TODO token的缓存处理，后续怎么跳转页面等。
+            // TODO 这里可以进行跳转，携带用户信息参数
+
+            return success();
+        }
+        return error("");
+    }
+
     private WxMpXmlOutMessage route(String wxId, WxMpXmlMessage message) {
         try {
-            WxMpMessageRouter router = globalCache.getMpRouter(wxId);
+            WxMpMessageRouter router = globalParamManager.getMpRouter(wxId);
             if (router != null) {
                 return router.route(message);
             }
@@ -128,7 +209,7 @@ public class WechatController {
     }
 
     private String routerMpMessage(WxApp wxApp, String requestBody, String signature, String timestamp, String nonce, String encType, String msgSignature) {
-        WxMpService wxMpService = globalCache.getMpService(wxApp.getWxId());
+        WxMpService wxMpService = globalParamManager.getMpService(wxApp.getWxId());
         if (wxMpService != null) {
             if (!wxMpService.checkSignature(timestamp, nonce, signature)) {
                 logger.error("illegal params");
@@ -166,6 +247,7 @@ public class WechatController {
     }
 
     private String routerCpMessage(WxApp wxApp, String requestBody, String signature, String timestamp, String nonce, String encType, String msgSignature) {
+        // TODO
         return null;
     }
 }

@@ -1,4 +1,4 @@
-package com.micropace.ramp.wechat.controller.buser;
+package com.micropace.ramp.wechat.controller;
 
 import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.enums.ErrorMsg;

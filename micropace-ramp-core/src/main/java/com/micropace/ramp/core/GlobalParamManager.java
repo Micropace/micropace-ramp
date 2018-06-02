@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 系统全局参数初始化缓存
- * 负责为所有公众号创建、本地配置、消息分发服务、消息路由
+ * 系统全局参数管理器
+ * 启动时，负责为所有公众号创建、本地配置、消息分发服务、消息路由
  *
  * @author Suffrajet
  */
 @Component
-public class GlobalParamCache {
+public class GlobalParamManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalParamCache.class);
+    private static final Logger logger = LoggerFactory.getLogger(GlobalParamManager.class);
 
     private IWxMsgService iWxMsgService;
 

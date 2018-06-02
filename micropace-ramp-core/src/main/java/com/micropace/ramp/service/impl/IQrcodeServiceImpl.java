@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.service.impl.ServiceImpl;
 import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.QrCodeTypeEnum;
-import com.micropace.ramp.core.GlobalParamCache;
+import com.micropace.ramp.core.GlobalParamManager;
 import com.micropace.ramp.mapper.QrcodeMapper;
 import com.micropace.ramp.service.IQrcodeService;
 import me.chanjar.weixin.common.exception.WxErrorException;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class IQrcodeServiceImpl extends ServiceImpl<QrcodeMapper, Qrcode> implements IQrcodeService {
 
     @Autowired
-    private GlobalParamCache globalCache;
+    private GlobalParamManager globalCache;
     @Value("${upload.path}")
     private String uploadPath;
 

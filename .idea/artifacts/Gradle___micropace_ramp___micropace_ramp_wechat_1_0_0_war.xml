@@ -1,0 +1,11 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="Gradle : micropace-ramp : micropace-ramp-wechat-1.0.0.war">
+    <output-path>$PROJECT_DIR$/micropace-ramp-wechat/build/libs</output-path>
+    <properties id="gradle-properties">
+      <options external-project-path="$PROJECT_DIR$" />
+    </properties>
+    <root id="archive" name="micropace-ramp-wechat-1.0.0.war">
+      <element id="artifact" artifact-name="Gradle : micropace-ramp : micropace-ramp-wechat-1.0.0.war (exploded)" />
+    </root>
+  </artifact>
+</component>
