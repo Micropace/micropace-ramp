@@ -1,7 +1,5 @@
 package com.micropace.ramp.base.common;
 
-import com.micropace.ramp.base.enums.ErrorMsg;
-
 /**
  * 控制器基类
  */

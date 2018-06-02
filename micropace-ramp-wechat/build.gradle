@@ -7,7 +7,6 @@ buildscript {
         jacksonVersion      = '2.9.5'
     }
     repositories {
-        mavenCentral()
         maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
     }
     dependencies {
@@ -18,7 +17,7 @@ buildscript {
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'org.springframework.boot'
-
+apply plugin: 'war'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -30,30 +29,27 @@ jar {
     }
 }
 
-//apply plugin: 'war'
-//war {
-//    baseName = "micropace-ramp-wechat"
-//    version = version
-//}
+war {
+    baseName = "micropace-ramp-wechat"
+}
 
 repositories {
-    mavenCentral()
     maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
 }
 
 dependencies {
     // war方式禁用自带tomcat
-//    providedCompile "org.springframework.boot:spring-boot-starter-tomcat:${springbootVersion}"
+    providedCompile "org.springframework.boot:spring-boot-starter-tomcat:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-jdbc:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-data-rest:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
+    compile "org.springframework.boot:spring-boot-starter-jdbc:${springbootVersion}"
     compile 'mysql:mysql-connector-java:6.0.5'
     compile 'com.alibaba:druid:1.1.9'
 
     // http 请求库
     compile 'org.apache.httpcomponents:httpclient:4.5.5'
 
+    // 引入子模块
     compile project(':micropace-ramp-base')
     compile project(':micropace-ramp-core')
 }

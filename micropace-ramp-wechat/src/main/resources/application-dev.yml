@@ -21,7 +21,7 @@ spring:
 
 server:
   address: 127.0.0.1
-  domain: f6e94c0c.ngrok.io
+  domain: a336a7bf.ngrok.io
 
 mybatis-plus:
   global-config:

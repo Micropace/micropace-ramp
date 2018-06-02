@@ -11,13 +11,9 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum QrCodeTypeEnum {
-    /** 永久的 */
     PERMANENT(0, "永久二维码"),
-    /** 临时的 */
     PROVISIONAL(1, "临时二维码");
 
-    /** 序号 */
     private Integer code;
-    /** 描述 */
     private String desc;
 }

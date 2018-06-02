@@ -8,7 +8,6 @@ buildscript {
         jacksonVersion      = '2.9.5'
     }
     repositories {
-        mavenCentral()
         maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
     }
     dependencies {
@@ -30,17 +29,12 @@ jar {
 }
 
 repositories {
-    mavenCentral()
     maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
 }
 
 dependencies {
-    compile "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-jdbc:${springbootVersion}"
-    compile "org.springframework.boot:spring-boot-starter-data-rest:${springbootVersion}"
+    compile "org.springframework.boot:spring-boot-starter:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-data-redis:${springbootVersion}"
-    compile 'mysql:mysql-connector-java:6.0.5'
-    compile 'com.alibaba:druid:1.1.9'
 
     //微信开发相关=========================
     //小程序
