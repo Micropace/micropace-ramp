@@ -3,15 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/IdeaProjects-micropace-ramp.iml" filepath="$PROJECT_DIR$/.idea/modules/IdeaProjects-micropace-ramp.iml" />
-      <module fileurl="file://$PROJECT_DIR$/micropace-ramp.iml" filepath="$PROJECT_DIR$/micropace-ramp.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-base.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-base.iml" group="micropace-ramp-base" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-base/micropace-ramp-base_main.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-base/micropace-ramp-base_main.iml" group="micropace-ramp-base" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-base/micropace-ramp-base_test.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-base/micropace-ramp-base_test.iml" group="micropace-ramp-base" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core.iml" group="micropace-ramp-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core.iml" group="micropace-ramp-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_main.iml" group="micropace-ramp-core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_main.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_main.iml" group="micropace-ramp-core" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_test.iml" group="micropace-ramp-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_test.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-core/micropace-ramp-core_test.iml" group="micropace-ramp-core" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-wechat.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-wechat.iml" group="micropace-ramp-wechat" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/micropace-ramp-wechat/micropace-ramp-wechat_main.iml" filepath="$PROJECT_DIR$/.idea/modules/micropace-ramp-wechat/micropace-ramp-wechat_main.iml" group="micropace-ramp-wechat" />
