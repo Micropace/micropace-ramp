@@ -35,6 +35,8 @@ public class Session {
     /** 会话每个步骤的内容记录 */
     private Map<Long, Object> contents;
 
+    public Session() {}
+
     public Session(String openid) {
         this.openid      = openid;
         this.timestemp   = System.currentTimeMillis();
@@ -56,11 +58,11 @@ public class Session {
      * @param stepContent 最新一步的会话内容
      */
     public void next(Object stepContent) {
+        this.currentStep += 1;
         if(this.stepCount > 0) {
             if(stepContent != null) {
                 this.contents.put(Long.parseLong(String.valueOf(this.currentStep)), stepContent);
             }
-            this.currentStep += 1;
             if(this.currentStep >= this.stepCount) {
                 this.currentStep = this.stepCount;
             }
@@ -80,11 +82,5 @@ public class Session {
         return this.contents.get(Long.parseLong(String.valueOf(step)));
     }
 
-    /**
-     * 获取最新步骤下的会话内容
-     * @return Object
-     */
-    public Object getLastContent() {
-        return this.contents.get(Long.parseLong(String.valueOf(this.currentStep)));
-    }
+
 }

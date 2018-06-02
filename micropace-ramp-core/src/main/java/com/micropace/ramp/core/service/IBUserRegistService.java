@@ -11,34 +11,20 @@ public interface IBUserRegistService {
      * 注册会话过期时间 5分钟
      */
     int SESSION_EXPIRE = 5 * 60;
-    /**
-     * 用户重复申请注册
-     */
-    String REPLY_REGISTER_APPLY_REPEAT = "您已注册过，如果需要更换注册手机号，请输入您的手机号，点击“发送”";
-    /**
-     * 用户已开启注册会话
-     */
+    /** 用户重复申请注册 */
+    String REPLY_REGISTER_APPLY_REPEAT = "您已注册过";
+    /** 用户已开启注册会话 */
     String REPLY_REGISTER_SESSION_STARTED = "您已发送过注册命令，请输入您的手机号，点击“发送”";
-    /**
-     * 用户申请注册成功
-     */
+    /** 用户申请注册成功 */
     String REPLY_REGISTER_APPLY_SUCCESS = "请输入您的手机号，点击“发送”";
-    /**
-     * 手机号格式验证失败
-     */
+    /** 手机号格式验证失败 */
     String REPLY_REGISTER_MOBILE_ILLIGAL = "手机号格式错误，请重新输入正确的手机号，点击“发送”";
-    /**
-     * 手机号验证成功
-     */
-    String REPLY_REGISTER_MOBILE_RECIEVED = "验证码已短信发送至目标手机，请您查看并输入验证码，点击“发送”";
-    /**
-     * 验证码错误
-     */
+    /** 手机号验证成功 */
+    String REPLY_REGISTER_MOBILE_RECIEVED = "验证码已短信发送至目标手机，请查看并输入验证码，点击“发送”";
+    /** 验证码错误 */
     String REPLY_REGISTER_VALIDATE_FAILED = "您输入的验证码不正确，请重新输入您手机收到的短信验证码，点击“发送”";
-    /**
-     * 验证码正确，注册成功。
-     */
-    String REPLY_REGISTER_SUCCESS_FINISH = "注册已完成，审核通过后将为您分发二维码";
+    /** 验证码正确，注册成功 */
+    String REPLY_REGISTER_SUCCESS_FINISH = "验证通过。您的注册申请已提交审核，通过后将为您分发二维码";
 
     /**
      * 检查注册会话是否已开启
@@ -48,6 +34,14 @@ public interface IBUserRegistService {
      * @return true 已开启
      */
     boolean isSessionActive(String wxId, String openid);
+
+    /**
+     * 获取当前注册会话的已完成的步骤
+     * @param wxId B公众号原始ID
+     * @param openid B用户openid
+     * @return 步骤数
+     */
+    int getStep(String wxId, String openid);
 
     /**
      * 申请注册，开启注册会话，注册会话默认5分钟有效期
