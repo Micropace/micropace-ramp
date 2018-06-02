@@ -1,4 +1,4 @@
-package com.micropace.ramp.core.handler;
+package com.micropace.ramp.core.dispatch.handler;
 
 import me.chanjar.weixin.mp.api.WxMpMessageHandler;
 import org.slf4j.Logger;

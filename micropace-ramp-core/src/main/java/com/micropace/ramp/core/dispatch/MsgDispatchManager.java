@@ -1,13 +1,14 @@
-package com.micropace.ramp.core.config;
+package com.micropace.ramp.core.dispatch;
 
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxTypeEnum;
+import com.micropace.ramp.core.dispatch.handler.*;
 import com.micropace.ramp.core.service.IWxAppService;
-import com.micropace.ramp.core.service.IWxMsgService;
+import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.cp.config.WxCpConfigStorage;
 import me.chanjar.weixin.cp.message.WxCpMessageRouter;
-import me.chanjar.weixin.mp.api.WxMpConfigStorage;
+import me.chanjar.weixin.mp.api.WxMpInMemoryConfigStorage;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.slf4j.Logger;
@@ -20,29 +21,41 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 系统全局参数管理器
+ * 微信公众号消息派发管理器
  * 启动时，负责为所有公众号创建、本地配置、消息分发服务、消息路由
  *
  * @author Suffrajet
  */
 @Component
-public class GlobalParamManager {
+public class MsgDispatchManager {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalParamManager.class);
+    private static final Logger logger = LoggerFactory.getLogger(MsgDispatchManager.class);
 
-    private IWxMsgService iWxMsgService;
+    @Autowired
+    protected LogHandler logHandler;
+    @Autowired
+    protected NullHandler nullHandler;
+    @Autowired
+    private MsgLocationHandler msgLocationHandler;
+    @Autowired
+    private MsgImageHandler msgImageHandler;
+    @Autowired
+    private MenuHandler menuHandler;
+    @Autowired
+    private MsgTextHandler msgTextHandler;
+    @Autowired
+    private MsgScanHandler msgScanHandler;
+    @Autowired
+    private MsgUnsubscribeHandler msgUnsubscribeHandler;
+    @Autowired
+    private MsgSubscribeHandler msgSubscribeHandler;
 
     /** 所有已托管的公众号、小程序 */
     private List<WxApp> wxApps;
-    /** 多公众号(订阅号和服务号)的配置信息，键名为公众号的原始ID */
-    private volatile Map<String, WxMpConfigStorage> wxMpAppStorages = new HashMap<>();
     /** 多公众号(订阅号和服务号)的消息分发服务，键名为公众号的原始ID */
     private volatile Map<String, WxMpService> wxMpAppServices = new HashMap<>();
     /** 多公众号(订阅号和服务号)的消息路由，键名为公众号的原始ID */
     private volatile Map<String, WxMpMessageRouter> wxMpAppRouters = new HashMap<>();
-
-    /** 多公众号(企业号)的配置信息，键名为公众号的原始ID */
-    private volatile Map<String, WxCpConfigStorage> wxCpAppStorages = new HashMap<>();
     /** 多公众号(企业号)的消息分发服务，键名为公众号的原始ID */
     private volatile Map<String, WxCpService> wxCpAppServices = new HashMap<>();
     /** 多公众号(企业号)的消息路由，键名为公众号的原始ID */
@@ -51,11 +64,10 @@ public class GlobalParamManager {
     // TODO 增加小程序的服务
 
     /**
-     * 为已托管的微信公众号创建服务管理接口
+     * 为已托管的微信公众号自动创建服务管理接口和消息路由
      */
     @Autowired
-    public void init(IWxAppService iWxAppService, IWxMsgService iWxMsgService) {
-        this.iWxMsgService = iWxMsgService;
+    public void init(IWxAppService iWxAppService) {
         List<WxApp> wxApps = iWxAppService.selectAll();
         if (wxApps != null && wxApps.size() > 0) {
             this.wxApps = wxApps;
@@ -120,26 +132,6 @@ public class GlobalParamManager {
     }
 
     /**
-     * 获取订阅号和服务号的本地配置缓存
-     *
-     * @param wxId 微信公众号原始ID
-     * @return 本地配置缓存
-     */
-    public WxMpConfigStorage getMpConfigStorage(String wxId) {
-        return this.wxMpAppStorages.get(wxId);
-    }
-
-    /**
-     * 获取企业号的本地配置缓存
-     *
-     * @param wxId 微信公众号原始ID
-     * @return 本地配置缓存
-     */
-    public WxCpConfigStorage getCpConfigStorage(String wxId) {
-        return this.wxCpAppStorages.get(wxId);
-    }
-
-    /**
      * 获取订阅号和服务号的消息服务接口
      *
      * @param wxId 微信公众号原始ID
@@ -179,6 +171,10 @@ public class GlobalParamManager {
         return this.wxCpAppRouters.get(wxId);
     }
 
+    /**
+     * 根据不同类型公众号来初始化不同的消息处理服务类
+     * @param wxApp 微信公众号
+     */
     private void initWxAppService(WxApp wxApp) {
         if (WxTypeEnum.APP_SERVICE.getCode().equals(wxApp.getWxType())
                 || WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())) {
@@ -194,27 +190,27 @@ public class GlobalParamManager {
 
     /** 初始化订阅号和服务号的服务 */
     private void initMpService(WxApp wxApp) {
-        WxMpConfigStorage configStorage = this.iWxMsgService.getMpMsgConfigStorage(wxApp);
-        if (configStorage != null) {
-            if (this.wxMpAppStorages.containsKey(wxApp.getWxId())) {
-                logger.debug("refresh wxapp {} config storage", wxApp.getWxId());
-                this.wxMpAppStorages.replace(wxApp.getWxId(), configStorage);
-            } else {
-                logger.debug("init wxapp {} config storage", wxApp.getWxId());
-                this.wxMpAppStorages.put(wxApp.getWxId(), configStorage);
-            }
+        if(wxApp == null) {
+            return;
         }
-        WxMpService wxMpService = this.iWxMsgService.getMpMsgService(configStorage);
-        if (wxMpService != null) {
-            if (this.wxMpAppServices.containsKey(wxApp.getWxId())) {
-                logger.info("refresh wxapp {} message service", wxApp.getWxId());
-                this.wxMpAppServices.replace(wxApp.getWxId(), wxMpService);
-            } else {
-                logger.info("init wxapp {} message service", wxApp.getWxId());
-                this.wxMpAppServices.put(wxApp.getWxId(), wxMpService);
-            }
+
+        WxMpInMemoryConfigStorage configStorage = new WxMpInMemoryConfigStorage();
+        configStorage.setAppId(wxApp.getAppId());
+        configStorage.setSecret(wxApp.getSecret());
+        configStorage.setToken(wxApp.getToken());
+        configStorage.setAesKey(wxApp.getAesKey());
+
+        WxMpService wxMpService = new me.chanjar.weixin.mp.api.impl.WxMpServiceImpl();
+        wxMpService.setWxMpConfigStorage(configStorage);
+        if (this.wxMpAppServices.containsKey(wxApp.getWxId())) {
+            logger.info("refresh wxapp {} message service", wxApp.getWxId());
+            this.wxMpAppServices.replace(wxApp.getWxId(), wxMpService);
+        } else {
+            logger.info("init wxapp {} message service", wxApp.getWxId());
+            this.wxMpAppServices.put(wxApp.getWxId(), wxMpService);
         }
-        WxMpMessageRouter router = this.iWxMsgService.getMpMsgRouter(wxMpService);
+
+        WxMpMessageRouter router = this.getMpMsgRouter(wxMpService);
         if (router != null) {
             if (this.wxMpAppRouters.containsKey(wxApp.getWxId())) {
                 logger.debug("refresh wxapp {} message router", wxApp.getWxId());
@@ -228,17 +224,7 @@ public class GlobalParamManager {
 
     /** 初始化企业号的服务 */
     private void initCpService(WxApp wxApp) {
-        WxCpConfigStorage configStorage = this.iWxMsgService.getCpMsgConfigStorage(wxApp);
-        if (configStorage != null) {
-            if (this.wxCpAppStorages.containsKey(wxApp.getWxId())) {
-                logger.debug("refresh wxapp {} config storage", wxApp.getWxId());
-                this.wxCpAppStorages.replace(wxApp.getWxId(), configStorage);
-            } else {
-                logger.debug("init wxapp {} config storage", wxApp.getWxId());
-                this.wxCpAppStorages.put(wxApp.getWxId(), configStorage);
-            }
-        }
-        WxCpService wxMpService = this.iWxMsgService.getCpMsgService(configStorage);
+        WxCpService wxMpService = this.getCpMsgService(this.getCpMsgConfigStorage(wxApp));
         if (wxMpService != null) {
             if (this.wxCpAppServices.containsKey(wxApp.getWxId())) {
                 logger.info("refresh wxapp {} message service", wxApp.getWxId());
@@ -248,7 +234,7 @@ public class GlobalParamManager {
                 this.wxCpAppServices.put(wxApp.getWxId(), wxMpService);
             }
         }
-        WxCpMessageRouter router = this.iWxMsgService.getCpMsgRouter(wxMpService);
+        WxCpMessageRouter router = this.getCpMsgRouter(wxMpService);
         if (router != null) {
             if (this.wxCpAppRouters.containsKey(wxApp.getWxId())) {
                 logger.debug("refresh wxapp {} message router", wxApp.getWxId());
@@ -263,5 +249,73 @@ public class GlobalParamManager {
     /** 初始化小程序的服务 */
     private void initMaService(WxApp wxApp) {
         // TODO 初始化小程序的服务
+    }
+
+    private WxMpMessageRouter getMpMsgRouter(WxMpService service) {
+        final WxMpMessageRouter router = new WxMpMessageRouter(service);
+
+        // 记录所有事件的日志（异步执行）
+        router.rule()
+                .handler(this.logHandler)
+                .next();
+
+        // 关注
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.EventType.SUBSCRIBE)
+                .handler(this.msgSubscribeHandler)
+                .end();
+        // 取消关注
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.EventType.UNSUBSCRIBE)
+                .handler(this.msgUnsubscribeHandler)
+                .end();
+        // 扫码
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.EventType.SCAN)
+                .handler(msgScanHandler)
+                .end();
+        // 自定义菜单-点击按钮
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.MenuButtonType.CLICK)
+                .handler(menuHandler)
+                .end();
+        // 自定义菜单-点击连接
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.MenuButtonType.VIEW)
+                .handler(this.nullHandler)
+                .end();
+        // 上报地理位置
+        router.rule().async(false).msgType(WxConsts.XmlMsgType.EVENT)
+                .event(WxConsts.EventType.LOCATION)
+                .handler(this.msgLocationHandler)
+                .end();
+
+        // 接收到地理位置消息
+        router.rule().async(false)
+                .msgType(WxConsts.XmlMsgType.LOCATION)
+                .handler(this.msgLocationHandler)
+                .end();
+        // 接收到图片消息
+        router.rule().async(false)
+                .msgType(WxConsts.XmlMsgType.IMAGE)
+                .handler(this.msgImageHandler)
+                .end();
+        // 接收到文本消息
+        router.rule().async(false)
+                .handler(this.msgTextHandler)
+                .end();
+        return router;
+    }
+
+    private WxCpConfigStorage getCpMsgConfigStorage(WxApp wxApp) {
+        return null;
+    }
+
+    private WxCpService getCpMsgService(WxCpConfigStorage storage) {
+        return null;
+    }
+
+    private WxCpMessageRouter getCpMsgRouter(WxCpService service) {
+        return null;
     }
 }

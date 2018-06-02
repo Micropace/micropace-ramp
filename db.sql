@@ -39,7 +39,7 @@ drop table if exists `c_user`;
 create table `c_user` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `openid` varchar(256) NOT NULL comment '微信OpenId',
-  `unionid` varchar(256) NOT NULL comment '微信UnionId',
+  `unionid` varchar(256) NULL comment '微信UnionId',
   `id_wx_app` BIGINT UNSIGNED NOT NULL comment '托管公众号信息表关联主键',
   `mobile` varchar(11) NULL comment '手机号',
   `nickname` varchar(32) NULL comment '用户昵称',
@@ -73,7 +73,7 @@ drop table if exists `b_user`;
 create table `b_user` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `openid` varchar(256) NOT NULL comment '微信OpenId',
-  `unionid` varchar(256) NOT NULL comment '微信UnionId',
+  `unionid` varchar(256) NULL comment '微信UnionId',
   `id_wx_app` BIGINT UNSIGNED NOT NULL comment 'wx_app表关联主键',
   -- 二维码绑定相关字段
   `id_qrcode` BIGINT UNSIGNED NULL comment 'qrcode表关联主键',
@@ -87,8 +87,8 @@ create table `b_user` (
   `city` varchar(32) NULL comment '用户所在城市',
   `avatar` varchar(320) NULL comment '用户头像链接地址',
   -- 用户注册相关字段
-  `mobile` varchar(11) NOT NULL comment '手机号',
-  `name` varchar(32) NOT NULL comment '真实姓名',
+  `mobile` varchar(11) NULL comment '手机号',
+  `name` varchar(32) NULL comment '真实姓名',
   `brand` varchar(64) NULL comment '品牌名称',
   `region` varchar(128) NULL comment '所在地区',
   `address` varchar(256) NULL comment '详细地址',

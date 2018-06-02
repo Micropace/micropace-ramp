@@ -1,7 +1,9 @@
 package com.micropace.ramp.core.service.impl;
 
+import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.micropace.ramp.base.common.RedisKeyBuilder;
 import com.micropace.ramp.base.constant.RedisSuffixConst;
+import com.micropace.ramp.base.util.StringUtil;
 import com.micropace.ramp.core.config.RedisManager;
 import com.micropace.ramp.base.entity.BUser;
 import com.micropace.ramp.base.entity.Session;
@@ -9,6 +11,7 @@ import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.core.service.IBUserRegistService;
 import com.micropace.ramp.core.service.IBUserService;
+import com.micropace.ramp.core.service.ISmsService;
 import com.micropace.ramp.core.service.IWxAppService;
 import com.micropace.ramp.base.util.ValidatorUtil;
 import org.slf4j.Logger;
@@ -26,7 +29,9 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
     @Autowired
     private IWxAppService iWxAppService;
     @Autowired
-    private IBUserService IBUserService;
+    private IBUserService ibUserService;
+    @Autowired
+    private ISmsService iSmsService;
 
     @Override
     public boolean isSessionActive(String wxId, String openid) {
@@ -40,7 +45,7 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
         WxApp wxApp = iWxAppService.selectByWxOriginId(wxId);
         if(wxApp != null) {
             // 检查是否已注册过
-            if (IBUserService.isRegisted(wxApp.getId(), openid)) {
+            if (ibUserService.isRegisted(wxApp.getId(), openid)) {
                 return REPLY_REGISTER_APPLY_REPEAT;
             }
 
@@ -71,8 +76,7 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
         if(wxApp != null) {
             // 检查该用户的会话是否存在和有效，是则发送验证码
             String key = RedisKeyBuilder.getSesstionKey(wxId, openid, RedisSuffixConst.REGISTER);
-            Session session = redisManager.helper()
-                    .getObj(key, Session.class);
+            Session session = redisManager.helper().getObj(key, Session.class);
             if(session != null) {
                 // 手机号校验
                 if(!ValidatorUtil.isMobile(mobile)) {
@@ -82,8 +86,10 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
                 // 将手机号存储到会话，并更新会话状态 step == 2
                 session.next(mobile);
 
-                // TODO 生成并发送验证码短信
-                String validateCode = "12345";
+                // 生成并发送验证码短信
+                String validateCode = StringUtil.getValidateCode();
+                SendSmsResponse response = iSmsService.sendValidateCode(mobile, validateCode);
+                logger.info("Send validate code message result: {}", response);
 
                 // 将验证码存储到会话，并更新会话状态 step == 3
                 session.next(validateCode);
@@ -121,12 +127,12 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
                     // 结束会话，删除Session
                     redisManager.helper().deleteKey(key);
 
-                    BUser bUser = IBUserService.selectByOpenid(wxApp.getId(), openid);
+                    BUser bUser = ibUserService.selectByOpenid(wxApp.getId(), openid);
                     if(bUser != null) {
                         // 验证码正确，提交注册信息, 进入待审核状态
                         bUser.setMobile(mobile);
                         bUser.setStatus(RegisterStatusEnum.PROCESSING.getCode());
-                        if (IBUserService.updateById(bUser)) {
+                        if (ibUserService.updateById(bUser)) {
                             return REPLY_REGISTER_SUCCESS_FINISH;
                         }
                     }
