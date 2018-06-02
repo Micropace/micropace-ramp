@@ -1,6 +1,6 @@
 package com.micropace.ramp.core.handler;
 
-import com.micropace.ramp.core.builder.TextBuilder;
+import com.micropace.ramp.core.handler.builder.TextBuilder;
 import com.micropace.ramp.base.entity.CUser;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.core.service.ICUserService;

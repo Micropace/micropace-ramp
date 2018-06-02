@@ -1,7 +1,7 @@
-package com.micropace.ramp;
+package com.micropace.ramp.core;
 
 import org.springframework.context.annotation.ComponentScan;
 
 @ComponentScan
-public class RampCoreConfigure {
+public class RampCoreConfiguration {
 }

@@ -1,7 +1,7 @@
 package com.micropace.ramp.core.handler;
 
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;
-import com.micropace.ramp.core.builder.TextBuilder;
+import com.micropace.ramp.core.handler.builder.TextBuilder;
 import com.micropace.ramp.base.entity.*;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.core.service.*;

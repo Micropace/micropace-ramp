@@ -6,6 +6,11 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * C用户网页授权token存储类
+ *
+ * @author suffrajet
+ */
 @Getter
 @Setter
 @ToString

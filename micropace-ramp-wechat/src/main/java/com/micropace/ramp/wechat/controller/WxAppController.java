@@ -3,7 +3,7 @@ package com.micropace.ramp.wechat.controller;
 import com.baomidou.mybatisplus.plugins.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micropace.ramp.base.common.BaseController;
-import com.micropace.ramp.base.enums.ErrorMsg;
+import com.micropace.ramp.base.common.ErrorMsg;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.constant.GlobalConst;
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;

@@ -25,8 +25,6 @@ public enum WxTypeEnum {
         return null;
     }
 
-    /** 编号 */
     private Integer code;
-    /** 描述 */
     private String desc;
 }

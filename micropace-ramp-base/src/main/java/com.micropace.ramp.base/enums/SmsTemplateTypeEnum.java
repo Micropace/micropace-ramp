@@ -13,10 +13,7 @@ import lombok.Getter;
 public enum SmsTemplateTypeEnum {
     SMS_TEMPLATE_LOVESELF(0, "SMS_134520038", "爱自己");
 
-    /** 序号 */
     private int index;
-    /** 编码 */
     private String code;
-    /** 描述 */
     private String desc;
 }

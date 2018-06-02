@@ -1,6 +1,6 @@
 package com.micropace.ramp.core.handler;
 
-import com.micropace.ramp.core.builder.TextBuilder;
+import com.micropace.ramp.core.handler.builder.TextBuilder;
 import com.micropace.ramp.core.service.IBUserRegistService;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;

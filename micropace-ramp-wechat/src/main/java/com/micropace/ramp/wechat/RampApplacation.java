@@ -1,13 +1,13 @@
 package com.micropace.ramp.wechat;
 
-import com.micropace.ramp.RampCoreConfigure;
+import com.micropace.ramp.core.RampCoreConfiguration;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
-@Import(RampCoreConfigure.class)
+@Import(RampCoreConfiguration.class)
 @EnableScheduling
 @SpringBootApplication
 public class RampApplacation {

@@ -1,4 +1,4 @@
-package com.micropace.ramp.base.enums;
+package com.micropace.ramp.base.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

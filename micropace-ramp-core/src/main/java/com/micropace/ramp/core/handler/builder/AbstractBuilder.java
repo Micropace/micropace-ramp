@@ -1,4 +1,4 @@
-package com.micropace.ramp.core.builder;
+package com.micropace.ramp.core.handler.builder;
 
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
