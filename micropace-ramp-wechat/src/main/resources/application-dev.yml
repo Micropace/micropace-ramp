@@ -1,3 +1,4 @@
+
 logging:
   level:
     org.springframework: WARN
@@ -20,7 +21,7 @@ spring:
 
 server:
   address: 127.0.0.1
-  domain: 98e3dfd0.ngrok.io
+  domain: f6e94c0c.ngrok.io
 
 mybatis-plus:
   global-config:
