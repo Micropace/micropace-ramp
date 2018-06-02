@@ -1,6 +1,5 @@
 package com.micropace.ramp.wechat.config;
 
-import com.micropace.ramp.wechat.filter.RequestFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;

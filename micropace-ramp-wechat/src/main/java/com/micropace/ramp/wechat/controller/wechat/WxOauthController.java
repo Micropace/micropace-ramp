@@ -2,9 +2,9 @@ package com.micropace.ramp.wechat.controller.wechat;
 
 import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.common.ResponseMsg;
-import com.micropace.ramp.wechat.core.initializer.GlobalParamManager;
+import com.micropace.ramp.core.GlobalParamCache;
 import com.micropace.ramp.base.entity.WxApp;
-import com.micropace.ramp.wechat.service.IWxAppService;
+import com.micropace.ramp.service.IWxAppService;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -25,11 +25,11 @@ import java.io.IOException;
 public class WxOauthController extends BaseController {
 
     @Autowired
+    private GlobalParamCache globalCache;
+    @Autowired
     private IWxAppService iWxAppService;
 
-    /**
-     * 自定义配置域名，www.name.com
-     */
+    /** 自定义配置域名，www.name.com */
     @Value("${server.domain}")
     private String serverDomain;
 
@@ -55,9 +55,9 @@ public class WxOauthController extends BaseController {
     @GetMapping("/login")
     public void index(@RequestParam("wxId") String wxId,
                       HttpServletResponse response) {
-        WxApp wxApp = iWxAppService.selectByWxOriginId(wxId);
+        WxApp wxApp = globalCache.getWxApp(wxId);
         if (wxApp != null) {
-            WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxId);
+            WxMpService wxMpService = globalCache.getMpService(wxId);
             if (wxMpService != null) {
                 String redirectUri = String.format("http://%s/api/service/oauth/callback", serverDomain);
                 String url = wxMpService.oauth2buildAuthorizationUrl(redirectUri, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
@@ -83,7 +83,7 @@ public class WxOauthController extends BaseController {
     @GetMapping("/callback")
     public ResponseMsg oauthCallback(@RequestParam("code") String code,
                                      @RequestParam("state") String state) {
-        WxMpService wxMpService = GlobalParamManager.getInstance().getService(state);
+        WxMpService wxMpService = globalCache.getMpService(state);
         if (wxMpService != null) {
             try {
                 WxMpOAuth2AccessToken accessToken = wxMpService.oauth2getAccessToken(code);

@@ -5,9 +5,10 @@ import com.micropace.ramp.base.enums.ErrorMsg;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.entity.WxApp;
-import com.micropace.ramp.base.enums.WxAppType;
-import com.micropace.ramp.wechat.service.IQrcodeService;
-import com.micropace.ramp.wechat.service.IWxAppService;
+import com.micropace.ramp.base.enums.WxAppCategoryEnum;
+import com.micropace.ramp.base.enums.WxTypeEnum;
+import com.micropace.ramp.service.IQrcodeService;
+import com.micropace.ramp.service.IWxAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -72,7 +73,7 @@ public class QrCodeController extends BaseController {
             return error(ErrorMsg.WX_APP_NOT_TRUST);
         }
         // 确保公众号是平台已托管的C类型公众号
-        if(!WxAppType.TYPE_C.getCode().equals(wxApp.getType())) {
+        if(!WxAppCategoryEnum.TYPE_C.getCode().equals(wxApp.getCategory())) {
             return error(ErrorMsg.QRCODE_ONLY_ALLOW_CTYPE);
         }
 

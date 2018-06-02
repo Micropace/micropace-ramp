@@ -22,9 +22,12 @@ public class WxApp extends MyBatisSuperEntity<WxApp> {
     private String token;
     @TableField("aes_key")
     private String aesKey;
-    /** 公众号类型{WxAppType} */
-    @TableField("type")
-    private Integer type;
+    /** 公众号类型：0:订阅号，1: 企业号，2: 服务号, 3: 小程序 */
+    @TableField("wx_type")
+    private Integer wxType;
+    /** 公众号所属分类：0:B类型公众号，1:C类型公众号 */
+    @TableField("category")
+    private Integer category;
     @TableField("industry")
     private String industry;
     @TableField("description")

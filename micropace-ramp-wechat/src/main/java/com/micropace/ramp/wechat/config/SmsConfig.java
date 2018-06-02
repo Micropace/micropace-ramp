@@ -30,7 +30,6 @@ public class SmsConfig {
 
     @Bean
     public IAcsClient getSmsClient() {
-        System.out.println(accessKeyId + "   " + accessKeySecret);
         try {
             IClientProfile profile = DefaultProfile.getProfile(region, accessKeyId, accessKeySecret);
             DefaultProfile.addEndpoint(region, region, product, domain);

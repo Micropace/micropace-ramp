@@ -6,11 +6,11 @@ import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.BUser;
 import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.entity.WxApp;
-import com.micropace.ramp.base.enums.RegisterStatus;
-import com.micropace.ramp.base.enums.QrCodeType;
-import com.micropace.ramp.wechat.service.IBUserService;
-import com.micropace.ramp.wechat.service.IQrcodeService;
-import com.micropace.ramp.wechat.service.IWxAppService;
+import com.micropace.ramp.base.enums.RegisterStatusEnum;
+import com.micropace.ramp.base.enums.QrCodeTypeEnum;
+import com.micropace.ramp.service.IBUserService;
+import com.micropace.ramp.service.IQrcodeService;
+import com.micropace.ramp.service.IWxAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,32 +53,32 @@ public class ManageBUserController extends BaseController {
             return error(ErrorMsg.USER_NOT_FOUND);
         }
 
-        if (!RegisterStatus.SUCCESSED.getCode().equals(bUser.getStatus())
+        if (!RegisterStatusEnum.SUCCESSED.getCode().equals(bUser.getStatus())
                 && bUser.getMobile() == null) {
             return error(ErrorMsg.USER_NOT_REGIST);
         }
 
         // 不可重复审核
-        if (RegisterStatus.SUCCESSED.getCode().equals(bUser.getStatus())
-                || RegisterStatus.FAILED.getCode().equals(bUser.getStatus())) {
+        if (RegisterStatusEnum.SUCCESSED.getCode().equals(bUser.getStatus())
+                || RegisterStatusEnum.FAILED.getCode().equals(bUser.getStatus())) {
             return error(ErrorMsg.REPEAT_CHECK_REGIST);
         }
 
         if (isPassed == 0) {
-            bUser.setStatus(RegisterStatus.FAILED.getCode());
+            bUser.setStatus(RegisterStatusEnum.FAILED.getCode());
             if (iBuserService.updateById(bUser)) {
                 return success();
             }
         } else {
             // 获取一个未被绑定的永久二维码
-            Qrcode qrcode = iQrcodeService.selectIdleOneByType(bUser.getIdWxApp(), QrCodeType.PERMANENT.getCode());
+            Qrcode qrcode = iQrcodeService.selectIdleOneByType(bUser.getIdWxApp(), QrCodeTypeEnum.PERMANENT.getCode());
             if (qrcode == null) {
                 return error(ErrorMsg.NO_AVAILABLE_QRCODE);
             }
             // 绑定二维码
             bUser.setIdQrcode(qrcode.getId());
             bUser.setBindAt(sf.format(new Date()));
-            bUser.setStatus(RegisterStatus.SUCCESSED.getCode());
+            bUser.setStatus(RegisterStatusEnum.SUCCESSED.getCode());
             if (iBuserService.updateById(bUser)) {
 
                 qrcode.setIsBind(1);
@@ -108,7 +108,7 @@ public class ManageBUserController extends BaseController {
         if (wxApp == null) {
             return error(ErrorMsg.WX_APP_NOT_TRUST);
         }
-        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatus.SUCCESSED);
+        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatusEnum.SUCCESSED);
         return success(passedBUsers);
     }
 
@@ -124,7 +124,7 @@ public class ManageBUserController extends BaseController {
         if (wxApp == null) {
             return error(ErrorMsg.WX_APP_NOT_TRUST);
         }
-        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatus.PROCESSING);
+        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatusEnum.PROCESSING);
         return success(passedBUsers);
     }
 
@@ -140,7 +140,7 @@ public class ManageBUserController extends BaseController {
         if (wxApp == null) {
             return error(ErrorMsg.WX_APP_NOT_TRUST);
         }
-        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatus.FAILED);
+        List<BUser> passedBUsers = iBuserService.selectSpecifiedStatusList(idWxApp, RegisterStatusEnum.FAILED);
         return success(passedBUsers);
     }
 }

@@ -1,10 +1,9 @@
-group 'micropace-ramp-wechat'
+group 'micropace-ramp'
 version '1.0.0'
 
 buildscript {
     ext {
         springbootVersion   = '1.5.10.RELEASE'
-        wxToosVersion       = '3.0.0'
         jacksonVersion      = '2.9.5'
     }
     repositories {
@@ -31,12 +30,20 @@ jar {
     }
 }
 
+//apply plugin: 'war'
+//war {
+//    baseName = "micropace-ramp-wechat"
+//    version = version
+//}
+
 repositories {
     mavenCentral()
     maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
 }
 
 dependencies {
+    // war方式禁用自带tomcat
+//    providedCompile "org.springframework.boot:spring-boot-starter-tomcat:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-test:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-jdbc:${springbootVersion}"
     compile "org.springframework.boot:spring-boot-starter-data-rest:${springbootVersion}"
@@ -47,19 +54,6 @@ dependencies {
     // http 请求库
     compile 'org.apache.httpcomponents:httpclient:4.5.5'
 
-    // 阿里云短信SDK
-    compile 'com.aliyun:aliyun-java-sdk-core:3.2.8'
-    compile 'com.aliyun:aliyun-java-sdk-dysmsapi:1.1.0'
-
-    //微信开发相关=========================
-    //小程序
-    compile "com.github.binarywang:weixin-java-miniapp:${wxToosVersion}"
-    //微信支付
-    compile "com.github.binarywang:weixin-java-pay:${wxToosVersion}"
-    //公众号(订阅号及服务号)
-    compile "com.github.binarywang:weixin-java-mp:${wxToosVersion}"
-    //企业号
-    compile "com.github.binarywang:weixin-java-cp:${wxToosVersion}"
-
     compile project(':micropace-ramp-base')
+    compile project(':micropace-ramp-core')
 }
