@@ -5,6 +5,6 @@ package com.micropace.ramp.base.enums;
  *
  * @author Suffrajet
  */
-public enum SessionStatus {
+public enum SessionStatusEnum {
 
 }

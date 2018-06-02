@@ -6,10 +6,10 @@ import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.CUser;
 import com.micropace.ramp.base.entity.BUser;
 import com.micropace.ramp.base.entity.Qrcode;
-import com.micropace.ramp.base.enums.RegisterStatus;
-import com.micropace.ramp.wechat.service.IBUserService;
-import com.micropace.ramp.wechat.service.IQrcodeService;
-import com.micropace.ramp.wechat.service.IRelationService;
+import com.micropace.ramp.base.enums.RegisterStatusEnum;
+import com.micropace.ramp.service.IBUserService;
+import com.micropace.ramp.service.IQrcodeService;
+import com.micropace.ramp.service.IRelationService;
 import com.micropace.ramp.base.util.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -63,7 +63,7 @@ public class BUserController extends BaseController {
 
         //提交注册信息, 进入待审核状态
         bUser.setMobile(mobile);
-        bUser.setStatus(RegisterStatus.PROCESSING.getCode());
+        bUser.setStatus(RegisterStatusEnum.PROCESSING.getCode());
         if (ibUserService.updateById(bUser)) {
             return success(ErrorMsg.REGIST_APPLY_SUCCESS);
         }
@@ -86,7 +86,7 @@ public class BUserController extends BaseController {
         Map<String, Object> result = new HashMap<>();
         int status = bUser.getStatus();
         result.put("state", status);
-        String message = RegisterStatus.getDescByCode(status);
+        String message = RegisterStatusEnum.getDescByCode(status);
         if(message != null) {
             result.put("message", message);
         }
@@ -168,13 +168,13 @@ public class BUserController extends BaseController {
         if (bUser == null) {
             return error(ErrorMsg.USER_NOT_FOUND);
         }
-        if (bUser.getStatus() == null || bUser.getStatus() == RegisterStatus.DEFAULT.getCode()) {
+        if (bUser.getStatus() == null || bUser.getStatus() == RegisterStatusEnum.DEFAULT.getCode()) {
             return error(ErrorMsg.USER_NOT_REGIST);
         }
-        if (bUser.getStatus() == RegisterStatus.PROCESSING.getCode()) {
+        if (bUser.getStatus() == RegisterStatusEnum.PROCESSING.getCode()) {
             return error(ErrorMsg.REGIST_CHECK_IS_PROCESSING);
         }
-        if (bUser.getStatus() == RegisterStatus.FAILED.getCode()) {
+        if (bUser.getStatus() == RegisterStatusEnum.FAILED.getCode()) {
             return error(ErrorMsg.REGIST_CHECK_DENY);
         }
         Qrcode qrcode = iQrcodeService.selectById(bUser.getIdQrcode());

@@ -4,20 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
- * 二维码类型
+ * 短信模版类型
  *
  * @author Suffrajet
  */
 @Getter
 @AllArgsConstructor
-public enum QrCodeType {
-    /** 永久的 */
-    PERMANENT(0, "永久二维码"),
-    /** 临时的 */
-    PROVISIONAL(1, "临时二维码");
+public enum SmsTemplateTypeEnum {
+    SMS_TEMPLATE_LOVESELF(0, "SMS_134520038", "爱自己");
 
     /** 序号 */
-    private Integer code;
+    private int index;
+    /** 编码 */
+    private String code;
     /** 描述 */
     private String desc;
 }

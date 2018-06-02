@@ -10,7 +10,7 @@ import lombok.Getter;
  */
 @Getter
 @AllArgsConstructor
-public enum RegisterStatus {
+public enum RegisterStatusEnum {
     /** 未注册 */
     DEFAULT(0, "未注册"),
     /** 已申请，等待审核中，不允许重新申请注册 */
@@ -26,7 +26,7 @@ public enum RegisterStatus {
     private String desc;
 
     public static String getDescByCode(Integer code) {
-        for(RegisterStatus item : values()) {
+        for(RegisterStatusEnum item : values()) {
             if(item.getCode().equals(code)) {
                 return item.getDesc();
             }

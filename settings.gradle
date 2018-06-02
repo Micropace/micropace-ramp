@@ -1,4 +1,4 @@
 rootProject.name = 'micropace-ramp'
 include 'micropace-ramp-base'
+include 'micropace-ramp-core'
 include 'micropace-ramp-wechat'
-

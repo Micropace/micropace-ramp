@@ -7,6 +7,6 @@ package com.micropace.ramp.base.constant;
  */
 public class RedisSuffixConst {
 
-    /**  */
+    /** B用户注册Session键名后缀 */
     public static final String REGISTER = "register";
 }

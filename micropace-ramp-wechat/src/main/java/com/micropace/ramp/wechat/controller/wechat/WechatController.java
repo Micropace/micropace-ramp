@@ -1,6 +1,9 @@
 package com.micropace.ramp.wechat.controller.wechat;
 
-import com.micropace.ramp.wechat.core.initializer.GlobalParamManager;
+import com.micropace.ramp.base.entity.WxApp;
+import com.micropace.ramp.base.enums.WxTypeEnum;
+import com.micropace.ramp.core.GlobalParamCache;
+import me.chanjar.weixin.cp.api.WxCpService;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
 import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
@@ -8,6 +11,7 @@ import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -19,6 +23,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/service")
 public class WechatController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+
+    @Autowired
+    private GlobalParamCache globalCache;
 
     /**
      * 微信服务器认证, url中需自带wxId字段，该字段是公众号的原始ID
@@ -41,11 +48,29 @@ public class WechatController {
         if (StringUtils.isAnyBlank(signature, timestamp, nonce, echostr)) {
             throw new IllegalArgumentException("illegal params");
         }
-        WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxId);
-        if (wxMpService != null) {
-            if (wxMpService.checkSignature(timestamp, nonce, signature)) {
-                return echostr;
+
+        WxApp wxApp = globalCache.getWxApp(wxId);
+        if (wxApp != null) {
+            // 服务号和订阅号的验证处理
+            if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
+                    || WxTypeEnum.APP_SERVICE.getCode().equals(wxApp.getWxType())) {
+                WxMpService wxMpService = globalCache.getMpService(wxId);
+                if (wxMpService != null) {
+                    if (wxMpService.checkSignature(timestamp, nonce, signature)) {
+                        return echostr;
+                    }
+                }
             }
+            // 企业号的验证处理
+            if (WxTypeEnum.APP_ENTERPRISE.getCode().equals(wxApp.getWxType())) {
+                WxCpService wxCpService = globalCache.getCpService(wxId);
+                if (wxCpService != null) {
+                    if (wxCpService.checkSignature(timestamp, nonce, signature, echostr)) {
+                        return echostr;
+                    }
+                }
+            }
+            // TODO 小程序的验证处理
         }
         return null;
     }
@@ -75,7 +100,35 @@ public class WechatController {
                         + " timestamp=[{}], nonce=[{}], requestBody=[\n{}] ",
                 signature, encType, msgSignature, timestamp, nonce, requestBody);
 
-        WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxId);
+        WxApp wxApp = globalCache.getWxApp(wxId);
+        if (wxApp != null) {
+            // 服务号和订阅号的消息路由
+            if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
+                    || WxTypeEnum.APP_SERVICE.getCode().equals(wxApp.getWxType())) {
+                return this.routerMpMessage(wxApp, requestBody, signature, timestamp, nonce, encType, msgSignature);
+            }
+            // 企业号的消息路由
+            if (WxTypeEnum.APP_ENTERPRISE.getCode().equals(wxApp.getWxType())) {
+                return this.routerCpMessage(wxApp, requestBody, signature, timestamp, nonce, encType, msgSignature);
+            }
+        }
+        return null;
+    }
+
+    private WxMpXmlOutMessage route(String wxId, WxMpXmlMessage message) {
+        try {
+            WxMpMessageRouter router = globalCache.getMpRouter(wxId);
+            if (router != null) {
+                return router.route(message);
+            }
+        } catch (Exception e) {
+            this.logger.error(e.getMessage(), e);
+        }
+        return null;
+    }
+
+    private String routerMpMessage(WxApp wxApp, String requestBody, String signature, String timestamp, String nonce, String encType, String msgSignature) {
+        WxMpService wxMpService = globalCache.getMpService(wxApp.getWxId());
         if (wxMpService != null) {
             if (!wxMpService.checkSignature(timestamp, nonce, signature)) {
                 logger.error("illegal params");
@@ -86,7 +139,7 @@ public class WechatController {
             if (encType == null) {
                 // 明文传输的消息
                 WxMpXmlMessage inMessage = WxMpXmlMessage.fromXml(requestBody);
-                WxMpXmlOutMessage outMessage = this.route(wxId, inMessage);
+                WxMpXmlOutMessage outMessage = this.route(wxApp.getWxId(), inMessage);
                 if (outMessage == null) {
                     return "";
                 }
@@ -99,7 +152,7 @@ public class WechatController {
                         timestamp,
                         nonce,
                         msgSignature);
-                WxMpXmlOutMessage outMessage = this.route(wxId, inMessage);
+                WxMpXmlOutMessage outMessage = this.route(wxApp.getWxId(), inMessage);
                 if (outMessage == null) {
                     return "";
                 }
@@ -112,15 +165,7 @@ public class WechatController {
         return null;
     }
 
-    private WxMpXmlOutMessage route(String wxId, WxMpXmlMessage message) {
-        try {
-            WxMpMessageRouter router = GlobalParamManager.getInstance().getRouter(wxId);
-            if (router != null) {
-                return router.route(message);
-            }
-        } catch (Exception e) {
-            this.logger.error(e.getMessage(), e);
-        }
+    private String routerCpMessage(WxApp wxApp, String requestBody, String signature, String timestamp, String nonce, String encType, String msgSignature) {
         return null;
     }
 }

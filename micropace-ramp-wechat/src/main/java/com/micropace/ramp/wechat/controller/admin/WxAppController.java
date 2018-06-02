@@ -6,10 +6,11 @@ import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.enums.ErrorMsg;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.constant.GlobalConst;
-import com.micropace.ramp.wechat.core.initializer.GlobalParamManager;
+import com.micropace.ramp.base.enums.WxAppCategoryEnum;
+import com.micropace.ramp.core.GlobalParamCache;
 import com.micropace.ramp.base.entity.WxApp;
-import com.micropace.ramp.base.enums.WxAppType;
-import com.micropace.ramp.wechat.service.IWxAppService;
+import com.micropace.ramp.base.enums.WxTypeEnum;
+import com.micropace.ramp.service.IWxAppService;
 import me.chanjar.weixin.common.bean.menu.WxMenu;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
@@ -39,6 +40,8 @@ public class WxAppController extends BaseController {
 
     private final ObjectMapper mapper = new ObjectMapper();
 
+    @Autowired
+    private GlobalParamCache globalCache;
     @Autowired
     private IWxAppService iWxAppService;
 
@@ -82,7 +85,7 @@ public class WxAppController extends BaseController {
     @GetMapping("/trust/b")
     public ResponseMsg getBLists(@RequestParam(name = "page", required = false) Integer page,
                                  @RequestParam(name = "pageSize", required = false) Integer pageSize) {
-        return success(iWxAppService.selectAllByType(WxAppType.TYPE_B));
+        return success(iWxAppService.selectAllByCategory(WxAppCategoryEnum.TYPE_B));
     }
 
     /**
@@ -92,17 +95,17 @@ public class WxAppController extends BaseController {
      */
     @GetMapping("/trust/c")
     public ResponseMsg getCLists() {
-        return success(iWxAppService.selectAllByType(WxAppType.TYPE_C));
+        return success(iWxAppService.selectAllByCategory(WxAppCategoryEnum.TYPE_C));
     }
 
     /**
-     * 获取当前所有已托管的C类型小程序
+     * 获取当前所有已托管的C类型小程序(小程序一定是C类型的)
      *
      * @return ResponseMsg
      */
     @GetMapping("/trust/miniapp")
     public ResponseMsg getMiniappCList() {
-        return success(iWxAppService.selectAllByType(WxAppType.TYPE_MINIAPP));
+        return success(iWxAppService.selectAllByType(WxTypeEnum.APP_MINI));
     }
 
     /**
@@ -126,7 +129,7 @@ public class WxAppController extends BaseController {
 
         if (iWxAppService.insert(wxApp)) {
             // 创建成功后，创建该公众号的消息服务接口
-            GlobalParamManager.getInstance().addWxApp(wxApp);
+            globalCache.addWxApp(wxApp);
             String url = String.format(GlobalConst.WECHAT_SERVER_TRUST_URL, serverAddress, wxApp.getWxId());
 
             Map<String, String> result = new HashMap<>();
@@ -157,7 +160,7 @@ public class WxAppController extends BaseController {
         }
 
         if (iWxAppService.updateById(wxApp)) {
-            GlobalParamManager.getInstance().resetWxApp(wxApp);
+            globalCache.resetWxApp(wxApp);
             return success();
         }
         return error(ErrorMsg.WX_APP_UPDATE_FAILED);
@@ -173,7 +176,7 @@ public class WxAppController extends BaseController {
     public ResponseMsg getWxMenu(@RequestParam("id") Long id) {
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxApp.getWxId());
+            WxMpService wxMpService = globalCache.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     WxMpMenu.WxMpConditionalMenu wxMenu = wxMpService.getMenuService().menuGet().getMenu();
@@ -188,7 +191,8 @@ public class WxAppController extends BaseController {
 
     /**
      * 创建公众号的自定义菜单
-     *  菜单示例：
+     * 菜单示例：
+     * <pre>
      *         {
      *             "buttons":[
      *                 {
@@ -218,6 +222,7 @@ public class WxAppController extends BaseController {
      *                 }
      *             ]
      *         }
+     * </pre>
      * @param params 参数 id 公众号记录ID menu 菜单JSON字符串
      * @return ResponseMsg
      */
@@ -239,7 +244,7 @@ public class WxAppController extends BaseController {
 
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxApp.getWxId());
+            WxMpService wxMpService = globalCache.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     wxMpService.getMenuService().menuCreate(wxMenu);
@@ -262,7 +267,7 @@ public class WxAppController extends BaseController {
     public ResponseMsg deleteWxMenu(@RequestParam("id") Long id) {
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = GlobalParamManager.getInstance().getService(wxApp.getWxId());
+            WxMpService wxMpService = globalCache.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     wxMpService.getMenuService().menuDelete();
