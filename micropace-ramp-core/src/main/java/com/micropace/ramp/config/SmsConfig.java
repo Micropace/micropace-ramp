@@ -1,4 +1,4 @@
-package com.micropace.ramp.wechat.config;
+package com.micropace.ramp.config;
 
 import com.aliyuncs.DefaultAcsClient;
 import com.aliyuncs.IAcsClient;
