@@ -1,6 +1,8 @@
 package com.micropace.ramp.core.service.impl;
 
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.micropace.ramp.base.common.RedisKeyBuilder;
 import com.micropace.ramp.base.constant.RedisSuffixConst;
 import com.micropace.ramp.base.util.StringUtil;
@@ -23,6 +25,7 @@ import org.springframework.stereotype.Service;
 public class IBUserRegistServiceImpl implements IBUserRegistService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
     private RedisManager redisManager;
@@ -36,8 +39,7 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
     @Override
     public boolean isSessionActive(String wxId, String openid) {
         String key = RedisKeyBuilder.getSesstionKey(wxId, openid, RedisSuffixConst.REGISTER);
-        return redisManager.helper()
-                .getObj(key, Session.class) != null;
+        return redisManager.helper().getObj(key, Session.class) != null;
     }
 
     @Override
@@ -71,6 +73,19 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
     }
 
     @Override
+    public int getStep(String wxId, String openid) {
+        WxApp wxApp = iWxAppService.selectByWxOriginId(wxId);
+        if(wxApp != null) {
+            String key = RedisKeyBuilder.getSesstionKey(wxId, openid, RedisSuffixConst.REGISTER);
+            Session session = redisManager.helper().getObj(key, Session.class);
+            if(session != null) {
+                return session.getCurrentStep();
+            }
+        }
+        return 0;
+    }
+
+    @Override
     public String submitMobile(String wxId, String openid, String mobile) {
         WxApp wxApp = iWxAppService.selectByWxOriginId(wxId);
         if(wxApp != null) {
@@ -89,7 +104,11 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
                 // 生成并发送验证码短信
                 String validateCode = StringUtil.getValidateCode();
                 SendSmsResponse response = iSmsService.sendValidateCode(mobile, validateCode);
-                logger.info("Send validate code message result: {}", response);
+                try {
+                    logger.info("Send validate code message result: {}", mapper.writeValueAsString(response));
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
 
                 // 将验证码存储到会话，并更新会话状态 step == 3
                 session.next(validateCode);
@@ -111,30 +130,28 @@ public class IBUserRegistServiceImpl implements IBUserRegistService {
         if(wxApp != null) {
             // 检查该用户的会话是否存在和有效，是则验证，验证通过后分配二维码。
             String key = RedisKeyBuilder.getSesstionKey(wxId, openid, RedisSuffixConst.REGISTER);
-            Session session = redisManager.helper()
-                    .getObj(key, Session.class);
+            Session session = redisManager.helper().getObj(key, Session.class);
             if (session != null) {
-
                 // 取出会话中存储的手机号
-                String mobile   = (String) session.getStepContent(2);
+                String mobile   = session.getStepContent(2);
                 // 取出会话中存储的验证码
-                String thatCode = (String) session.getStepContent(3);
+                String thatCode = session.getStepContent(3);
 
                 // 验证码输入错误
                 if (!validateCode.equals(thatCode)) {
                     return REPLY_REGISTER_VALIDATE_FAILED;
-                } else {
-                    // 结束会话，删除Session
-                    redisManager.helper().deleteKey(key);
+                }
 
-                    BUser bUser = ibUserService.selectByOpenid(wxApp.getId(), openid);
-                    if(bUser != null) {
-                        // 验证码正确，提交注册信息, 进入待审核状态
-                        bUser.setMobile(mobile);
-                        bUser.setStatus(RegisterStatusEnum.PROCESSING.getCode());
-                        if (ibUserService.updateById(bUser)) {
-                            return REPLY_REGISTER_SUCCESS_FINISH;
-                        }
+                // 结束会话，删除Session
+                redisManager.helper().deleteKey(key);
+
+                BUser bUser = ibUserService.selectByOpenid(wxApp.getId(), openid);
+                if(bUser != null) {
+                    // 验证码正确，提交注册信息, 进入待审核状态
+                    bUser.setMobile(mobile);
+                    bUser.setStatus(RegisterStatusEnum.PROCESSING.getCode());
+                    if (ibUserService.updateById(bUser)) {
+                        return REPLY_REGISTER_SUCCESS_FINISH;
                     }
                 }
             }

@@ -41,7 +41,7 @@ public class RedisHelper {
             try {
                 v = jedis.get(key);
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -64,7 +64,7 @@ public class RedisHelper {
                 String rp = jedis.set(key, value);
                 b = rp.toUpperCase().equals(GlobalConst.REDIS_OK);
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -88,7 +88,7 @@ public class RedisHelper {
                 String rp = jedis.setex(key, expire, value);
                 b = rp.toUpperCase().equals(GlobalConst.REDIS_OK);
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -114,7 +114,7 @@ public class RedisHelper {
                     v = mapper.readValue(json, clz);
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -140,7 +140,7 @@ public class RedisHelper {
                     b = rp.toUpperCase().equals(GlobalConst.REDIS_OK);
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -167,7 +167,7 @@ public class RedisHelper {
                     b = rp.toUpperCase().equals(GlobalConst.REDIS_OK);
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -190,7 +190,7 @@ public class RedisHelper {
                 jedis.rpush(key, value);
                 b = true;
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -216,7 +216,7 @@ public class RedisHelper {
                     b = true;
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -237,7 +237,7 @@ public class RedisHelper {
             try {
                 v = jedis.lpop(key);
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -263,7 +263,7 @@ public class RedisHelper {
                     v = mapper.readValue(json, clz);
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -293,7 +293,7 @@ public class RedisHelper {
                     }
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -328,7 +328,7 @@ public class RedisHelper {
                     }
                 }
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
@@ -347,7 +347,7 @@ public class RedisHelper {
             try {
                 jedis.del(key);
             } catch (Exception e) {
-                logger.error(key, e.getMessage());
+                logger.error(key + ": " + e.getMessage());
             } finally {
                 jedis.close();
             }
