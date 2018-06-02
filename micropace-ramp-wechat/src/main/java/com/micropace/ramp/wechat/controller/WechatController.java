@@ -4,7 +4,7 @@ import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxTypeEnum;
-import com.micropace.ramp.core.config.GlobalParamManager;
+import com.micropace.ramp.core.dispatch.MsgDispatchManager;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpService;
@@ -35,7 +35,7 @@ public class WechatController extends BaseController {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    private GlobalParamManager globalParamManager;
+    private MsgDispatchManager msgDispatchManager;
 
     /** 自定义配置域名，www.name.com */
     @Value("${server.domain}")
@@ -63,12 +63,12 @@ public class WechatController extends BaseController {
             throw new IllegalArgumentException("illegal params");
         }
 
-        WxApp wxApp = globalParamManager.getWxApp(wxId);
+        WxApp wxApp = msgDispatchManager.getWxApp(wxId);
         if (wxApp != null) {
             // 服务号和订阅号的验证处理
             if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
                     || WxTypeEnum.APP_SERVICE.getCode().equals(wxApp.getWxType())) {
-                WxMpService wxMpService = globalParamManager.getMpService(wxId);
+                WxMpService wxMpService = msgDispatchManager.getMpService(wxId);
                 if (wxMpService != null) {
                     if (wxMpService.checkSignature(timestamp, nonce, signature)) {
                         return echostr;
@@ -77,7 +77,7 @@ public class WechatController extends BaseController {
             }
             // 企业号的验证处理
             if (WxTypeEnum.APP_ENTERPRISE.getCode().equals(wxApp.getWxType())) {
-                WxCpService wxCpService = globalParamManager.getCpService(wxId);
+                WxCpService wxCpService = msgDispatchManager.getCpService(wxId);
                 if (wxCpService != null) {
                     if (wxCpService.checkSignature(timestamp, nonce, signature, echostr)) {
                         return echostr;
@@ -114,7 +114,7 @@ public class WechatController extends BaseController {
                         + " timestamp=[{}], nonce=[{}], requestBody=[\n{}] ",
                 signature, encType, msgSignature, timestamp, nonce, requestBody);
 
-        WxApp wxApp = globalParamManager.getWxApp(wxId);
+        WxApp wxApp = msgDispatchManager.getWxApp(wxId);
         if (wxApp != null) {
             // 服务号和订阅号的消息路由
             if (WxTypeEnum.APP_SUBSCRIBE.getCode().equals(wxApp.getWxType())
@@ -151,9 +151,9 @@ public class WechatController extends BaseController {
     @GetMapping("/oauth/login")
     public void index(@RequestParam("wxId") String wxId,
                       HttpServletResponse response) {
-        WxApp wxApp = globalParamManager.getWxApp(wxId);
+        WxApp wxApp = msgDispatchManager.getWxApp(wxId);
         if (wxApp != null) {
-            WxMpService wxMpService = globalParamManager.getMpService(wxId);
+            WxMpService wxMpService = msgDispatchManager.getMpService(wxId);
             if (wxMpService != null) {
                 String redirectUri = String.format("http://%s/api/service/oauth/callback", serverDomain);
                 String url = wxMpService.oauth2buildAuthorizationUrl(redirectUri, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
@@ -177,7 +177,7 @@ public class WechatController extends BaseController {
     @GetMapping("/oauth/callback")
     public ResponseMsg oauthCallback(@RequestParam("code") String code,
                                      @RequestParam("state") String state) {
-        WxMpService wxMpService = globalParamManager.getMpService(state);
+        WxMpService wxMpService = msgDispatchManager.getMpService(state);
         if (wxMpService != null) {
             try {
                 WxMpOAuth2AccessToken accessToken = wxMpService.oauth2getAccessToken(code);
@@ -198,7 +198,7 @@ public class WechatController extends BaseController {
 
     private WxMpXmlOutMessage route(String wxId, WxMpXmlMessage message) {
         try {
-            WxMpMessageRouter router = globalParamManager.getMpRouter(wxId);
+            WxMpMessageRouter router = msgDispatchManager.getMpRouter(wxId);
             if (router != null) {
                 return router.route(message);
             }
@@ -209,7 +209,7 @@ public class WechatController extends BaseController {
     }
 
     private String routerMpMessage(WxApp wxApp, String requestBody, String signature, String timestamp, String nonce, String encType, String msgSignature) {
-        WxMpService wxMpService = globalParamManager.getMpService(wxApp.getWxId());
+        WxMpService wxMpService = msgDispatchManager.getMpService(wxApp.getWxId());
         if (wxMpService != null) {
             if (!wxMpService.checkSignature(timestamp, nonce, signature)) {
                 logger.error("illegal params");

@@ -1,4 +1,4 @@
-package com.micropace.ramp.wechat.controller;
+package com.micropace.ramp.wechat.controller.ramp;
 
 import com.baomidou.mybatisplus.plugins.Page;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -7,7 +7,7 @@ import com.micropace.ramp.base.common.ErrorMsg;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.constant.GlobalConst;
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;
-import com.micropace.ramp.core.config.GlobalParamManager;
+import com.micropace.ramp.core.dispatch.MsgDispatchManager;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxTypeEnum;
 import com.micropace.ramp.core.service.IWxAppService;
@@ -41,7 +41,7 @@ public class WxAppController extends BaseController {
     private final ObjectMapper mapper = new ObjectMapper();
 
     @Autowired
-    private GlobalParamManager globalParamManager;
+    private MsgDispatchManager msgDispatchManager;
     @Autowired
     private IWxAppService iWxAppService;
 
@@ -129,7 +129,7 @@ public class WxAppController extends BaseController {
 
         if (iWxAppService.insert(wxApp)) {
             // 创建成功后，创建该公众号的消息服务接口
-            globalParamManager.addWxApp(wxApp);
+            msgDispatchManager.addWxApp(wxApp);
             String url = String.format(GlobalConst.WECHAT_SERVER_TRUST_URL, serverAddress, wxApp.getWxId());
 
             Map<String, String> result = new HashMap<>();
@@ -160,7 +160,7 @@ public class WxAppController extends BaseController {
         }
 
         if (iWxAppService.updateById(wxApp)) {
-            globalParamManager.resetWxApp(wxApp);
+            msgDispatchManager.resetWxApp(wxApp);
             return success();
         }
         return error(ErrorMsg.WX_APP_UPDATE_FAILED);
@@ -176,7 +176,7 @@ public class WxAppController extends BaseController {
     public ResponseMsg getWxMenu(@RequestParam("id") Long id) {
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = globalParamManager.getMpService(wxApp.getWxId());
+            WxMpService wxMpService = msgDispatchManager.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     WxMpMenu.WxMpConditionalMenu wxMenu = wxMpService.getMenuService().menuGet().getMenu();
@@ -244,7 +244,7 @@ public class WxAppController extends BaseController {
 
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = globalParamManager.getMpService(wxApp.getWxId());
+            WxMpService wxMpService = msgDispatchManager.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     wxMpService.getMenuService().menuCreate(wxMenu);
@@ -267,7 +267,7 @@ public class WxAppController extends BaseController {
     public ResponseMsg deleteWxMenu(@RequestParam("id") Long id) {
         WxApp wxApp = iWxAppService.selectById(id);
         if (wxApp != null) {
-            WxMpService wxMpService = globalParamManager.getMpService(wxApp.getWxId());
+            WxMpService wxMpService = msgDispatchManager.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
                     wxMpService.getMenuService().menuDelete();
