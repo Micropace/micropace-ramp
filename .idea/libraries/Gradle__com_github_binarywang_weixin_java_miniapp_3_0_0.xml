@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.binarywang:weixin-java-miniapp:3.0.0">
+    <CLASSES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/weixin-java-miniapp/3.0.0/e120d18cfe4f192a7eba5e47edfb4a8e73f863f2/weixin-java-miniapp-3.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/weixin-java-miniapp/3.0.0/74fb7bd36d41c4aeec1bc32bde7e2408c5cc8d65/weixin-java-miniapp-3.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

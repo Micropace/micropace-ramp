@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.baomidou:mybatis-plus:2.2.0">
+    <CLASSES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.baomidou/mybatis-plus/2.2.0/6bd16fac60ff1a89d0f83854da0f19bfc0e62c6c/mybatis-plus-2.2.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.baomidou/mybatis-plus/2.2.0/a94b191ba71e26f90cb759407acea8b2dac4f4fe/mybatis-plus-2.2.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

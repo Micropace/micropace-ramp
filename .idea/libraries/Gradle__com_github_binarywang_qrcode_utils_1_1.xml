@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.binarywang:qrcode-utils:1.1">
+    <CLASSES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/qrcode-utils/1.1/6a73c3fe79dae9fd762742576f790bbc3456d883/qrcode-utils-1.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/qrcode-utils/1.1/f24b8d34ab399e79f2f808b8da0a2035a684ce1e/qrcode-utils-1.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

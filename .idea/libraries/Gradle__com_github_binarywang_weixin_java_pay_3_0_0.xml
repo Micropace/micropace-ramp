@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.github.binarywang:weixin-java-pay:3.0.0">
+    <CLASSES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/weixin-java-pay/3.0.0/3c7b489894a394443334b5e62007757a392cba02/weixin-java-pay-3.0.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar:///usr/local/gradle-3.2.1/caches/modules-2/files-2.1/com.github.binarywang/weixin-java-pay/3.0.0/65f34d1137c795ce6f2f71400b0a4a2fb9ab6ea3/weixin-java-pay-3.0.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
