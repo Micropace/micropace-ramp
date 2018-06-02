@@ -8,9 +8,9 @@ import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.base.enums.QrCodeTypeEnum;
-import com.micropace.ramp.service.IBUserService;
-import com.micropace.ramp.service.IQrcodeService;
-import com.micropace.ramp.service.IWxAppService;
+import com.micropace.ramp.core.service.IBUserService;
+import com.micropace.ramp.core.service.IQrcodeService;
+import com.micropace.ramp.core.service.IWxAppService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

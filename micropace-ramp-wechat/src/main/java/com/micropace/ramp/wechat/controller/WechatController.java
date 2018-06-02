@@ -4,7 +4,7 @@ import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.WxTypeEnum;
-import com.micropace.ramp.core.GlobalParamManager;
+import com.micropace.ramp.core.config.GlobalParamManager;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.cp.api.WxCpService;
