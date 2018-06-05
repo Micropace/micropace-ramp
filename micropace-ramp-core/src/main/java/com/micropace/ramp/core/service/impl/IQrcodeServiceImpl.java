@@ -53,31 +53,29 @@ public class IQrcodeServiceImpl extends ServiceImpl<QrcodeMapper, Qrcode> implem
                     // 将二维码图片存储到本地
                     String path = uploadPath + "qrcode/";
                     File dir = new File(path);
-                    if(!dir.exists()) {
-                        if(dir.mkdirs()) {
-                            String filename = sceneStr + ".jpg";
-                            if(file.renameTo(new File(path + filename))) {
+                    if(!dir.exists()) dir.mkdir();
 
-                                // 创建记录
-                                Qrcode qrcode = new Qrcode();
-                                qrcode.setIdWxApp(wxApp.getId());
-                                qrcode.setSceneStr(sceneStr);
-                                qrcode.setType(isPermanent ? QrCodeTypeEnum.PERMANENT.getCode() : QrCodeTypeEnum.PROVISIONAL.getCode());
-                                qrcode.setTicket(ticket.getTicket());
-                                qrcode.setWxurl(url);
-                                qrcode.setLocalPath(path + filename);
-                                qrcode.setFilename(filename);
-                                qrcode.setIsBind(0);
-                                qrcode.setExpire(ticket.getExpireSeconds());
-                                if(super.baseMapper.insert(qrcode) == 1) {
-                                    result = new HashMap<>();
-                                    result.put("sceneStr", sceneStr);
-                                    result.put("path", "qrcode/" + filename);
-                                    result.put("filename", filename);
-                                    if(!isPermanent) {
-                                        result.put("expires", String.format("%d天", ticket.getExpireSeconds() / ( 24 * 60 * 60) ));
-                                    }
-                                }
+                    String filename = sceneStr + ".jpg";
+                    if(file.renameTo(new File(path + filename))) {
+
+                        // 创建记录
+                        Qrcode qrcode = new Qrcode();
+                        qrcode.setIdWxApp(wxApp.getId());
+                        qrcode.setSceneStr(sceneStr);
+                        qrcode.setType(isPermanent ? QrCodeTypeEnum.PERMANENT.getCode() : QrCodeTypeEnum.PROVISIONAL.getCode());
+                        qrcode.setTicket(ticket.getTicket());
+                        qrcode.setWxurl(url);
+                        qrcode.setLocalPath(path + filename);
+                        qrcode.setFilename(filename);
+                        qrcode.setIsBind(0);
+                        qrcode.setExpire(ticket.getExpireSeconds());
+                        if(super.baseMapper.insert(qrcode) == 1) {
+                            result = new HashMap<>();
+                            result.put("sceneStr", sceneStr);
+                            result.put("path", "qrcode/" + filename);
+                            result.put("filename", filename);
+                            if(!isPermanent) {
+                                result.put("expires", String.format("%d天", ticket.getExpireSeconds() / ( 24 * 60 * 60) ));
                             }
                         }
                     }
