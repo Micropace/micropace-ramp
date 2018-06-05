@@ -179,8 +179,11 @@ public class WxAppController extends BaseController {
             WxMpService wxMpService = msgDispatchManager.getMpService(wxApp.getWxId());
             if (wxMpService != null) {
                 try {
-                    WxMpMenu.WxMpConditionalMenu wxMenu = wxMpService.getMenuService().menuGet().getMenu();
-                    return success(wxMenu);
+                    WxMpMenu wxMpMenu = wxMpService.getMenuService().menuGet();
+                    if(wxMpMenu != null) {
+                        WxMpMenu.WxMpConditionalMenu menus = wxMpMenu.getMenu();
+                        return success(menus);
+                    }
                 } catch (WxErrorException e) {
                     logger.error(e.getMessage());
                 }

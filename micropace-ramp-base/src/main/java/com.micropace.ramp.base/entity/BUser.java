@@ -18,10 +18,6 @@ public class BUser extends MyBatisSuperEntity<BUser> {
     private String unionid;
     @TableField("id_wx_app")
     private Long idWxApp;
-    @TableField("id_qrcode")
-    private Long idQrcode;
-    @TableField("bind_at")
-    private String bindAt;
     /** 注册状态,0:未注册, 1:审核中, 2:审核通过 */
     @TableField("status")
     private Integer status;

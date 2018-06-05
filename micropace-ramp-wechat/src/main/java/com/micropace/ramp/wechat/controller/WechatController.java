@@ -18,9 +18,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -36,10 +36,6 @@ public class WechatController extends BaseController {
 
     @Autowired
     private MsgDispatchManager msgDispatchManager;
-
-    /** 自定义配置域名，www.name.com */
-    @Value("${server.domain}")
-    private String serverDomain;
 
     /**
      * 微信服务器认证, url中需自带wxId字段，该字段是公众号的原始ID
@@ -150,15 +146,16 @@ public class WechatController extends BaseController {
      */
     @GetMapping("/oauth/login")
     public void index(@RequestParam("wxId") String wxId,
-                      HttpServletResponse response) {
+                      HttpServletRequest request, HttpServletResponse response) {
         WxApp wxApp = msgDispatchManager.getWxApp(wxId);
         if (wxApp != null) {
             WxMpService wxMpService = msgDispatchManager.getMpService(wxId);
             if (wxMpService != null) {
-                String redirectUri = String.format("http://%s/api/service/oauth/callback", serverDomain);
-                String url = wxMpService.oauth2buildAuthorizationUrl(redirectUri, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
+                String resUrl      = request.getRequestURL().toString();
+                String callbackUrl = resUrl.substring(0, resUrl.lastIndexOf("/")) + "/callback";
+                String redirectUrl = wxMpService.oauth2buildAuthorizationUrl(callbackUrl, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
                 try {
-                    response.sendRedirect(url);
+                    response.sendRedirect(redirectUrl);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -175,7 +172,7 @@ public class WechatController extends BaseController {
      * @return 授权后的用户信息
      */
     @GetMapping("/oauth/callback")
-    public ResponseMsg oauthCallback(@RequestParam("code") String code,
+    public ResponseMsg oauthCallback(@RequestParam("code")  String code,
                                      @RequestParam("state") String state) {
         WxMpService wxMpService = msgDispatchManager.getMpService(state);
         if (wxMpService != null) {

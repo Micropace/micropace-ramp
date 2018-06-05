@@ -7,6 +7,7 @@ import com.micropace.ramp.base.entity.CUser;
 import com.micropace.ramp.base.entity.BUser;
 import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
+import com.micropace.ramp.core.service.IBUserBindQrcodeService;
 import com.micropace.ramp.core.service.IBUserService;
 import com.micropace.ramp.core.service.IQrcodeService;
 import com.micropace.ramp.core.service.IRelationService;
@@ -14,6 +15,7 @@ import com.micropace.ramp.base.util.ValidatorUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,8 @@ public class BUserController extends BaseController {
     private IQrcodeService iQrcodeService;
     @Autowired
     private IRelationService iRelationService;
+    @Autowired
+    private IBUserBindQrcodeService bindQrcodeService;
 
     /**
      * 申请注册
@@ -168,23 +172,30 @@ public class BUserController extends BaseController {
         if (bUser == null) {
             return error(ErrorMsg.USER_NOT_FOUND);
         }
-        if (bUser.getStatus() == null || bUser.getStatus() == RegisterStatusEnum.DEFAULT.getCode()) {
+        if (bUser.getStatus() == null || bUser.getStatus().equals(RegisterStatusEnum.DEFAULT.getCode())) {
             return error(ErrorMsg.USER_NOT_REGIST);
         }
-        if (bUser.getStatus() == RegisterStatusEnum.PROCESSING.getCode()) {
+        if (bUser.getStatus().equals(RegisterStatusEnum.PROCESSING.getCode())) {
             return error(ErrorMsg.REGIST_CHECK_IS_PROCESSING);
         }
-        if (bUser.getStatus() == RegisterStatusEnum.FAILED.getCode()) {
+        if (bUser.getStatus().equals(RegisterStatusEnum.FAILED.getCode())) {
             return error(ErrorMsg.REGIST_CHECK_DENY);
         }
-        Qrcode qrcode = iQrcodeService.selectById(bUser.getIdQrcode());
-        if (qrcode != null) {
-            Map<String, String> result = new HashMap<>();
+
+        List<Qrcode> qrcodes = bindQrcodeService.selectQrcodesByBuserId(bUser.getId());
+        if (qrcodes != null && qrcodes.size() > 0) {
+            List<Map<String, String>> items = new ArrayList<>();
+            for(Qrcode e : qrcodes) {
+                Map<String, String> item = new HashMap<>();
+                item.put("filename", e.getFilename());
+                item.put("sceneStr", e.getSceneStr());
+                item.put("url", e.getWxurl());
+                item.put("path", "/qrcode/" + e.getFilename());
+                items.add(item);
+            }
+            Map<String, Object> result = new HashMap<>();
             result.put("openid", bUser.getOpenid());
-            result.put("filename", qrcode.getFilename());
-            result.put("sceneStr", qrcode.getSceneStr());
-            result.put("url", qrcode.getWxurl());
-            result.put("path", "/qrcode/" + qrcode.getFilename());
+            result.put("qrcodes", items);
             return success(result);
         }
         return error(ErrorMsg.QUERY_QRCODE_FAILED);

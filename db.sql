@@ -75,9 +75,6 @@ create table `b_user` (
   `openid` varchar(256) NOT NULL comment '微信OpenId',
   `unionid` varchar(256) NULL comment '微信UnionId',
   `id_wx_app` BIGINT UNSIGNED NOT NULL comment 'wx_app表关联主键',
-  -- 二维码绑定相关字段
-  `id_qrcode` BIGINT UNSIGNED NULL comment 'qrcode表关联主键',
-  `bind_at` datetime NULL comment '绑定二维码的时间',
   `status` tinyint(4) NOT NULL DEFAULT 0 comment '注册状态,0:未注册, 1:审核中, 2:审核通过',
   -- 微信授权的用户信息相关字段
   `nickname` varchar(32) NULL comment '用户昵称',
@@ -95,6 +92,17 @@ create table `b_user` (
   `description` varchar(256) NULL comment '品牌描述',
   `is_deleted` tinyint(4) NOT NULL DEFAULT 0 comment '用户是否取消关注公众号 0:否, 1:是',
   `created_at` datetime NULL,
+  `updated_at` datetime NULL,
+  PRIMARY KEY (`id`)
+) engine=InnoDB auto_increment=1 default charset=utf8;
+
+-- B用户二维码绑定信息表
+drop table if exists `b_user_bind_qrcode`;
+create table `b_user_bind_qrcode` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_buser` BIGINT UNSIGNED NOT NULL comment 'B类型公众号用户表主键',
+  `id_qrcode` BIGINT UNSIGNED NULL comment 'qrcode表关联主键',
+  `created_at` datetime NOT NULL,
   `updated_at` datetime NULL,
   PRIMARY KEY (`id`)
 ) engine=InnoDB auto_increment=1 default charset=utf8;

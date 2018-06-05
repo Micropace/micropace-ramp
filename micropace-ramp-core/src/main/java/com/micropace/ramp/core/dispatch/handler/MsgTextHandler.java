@@ -26,29 +26,28 @@ public class MsgTextHandler extends AbstractHandler {
                                     Map<String, Object> context, WxMpService weixinService,
                                     WxSessionManager sessionManager) {
 
+        WxMpXmlOutMessage reply = this.handleRegisterSessionMsg(wxMessage, weixinService);
+        if(reply != null) {
+            return reply;
+        }
+
+        // TODO 其它的会话过程检查，存在则交给这些会话处理消息内容
+
+        //TODO 最后，如果没有开启的会话，则统一回复消息
+        String content = "收到文本消息：" + wxMessage.getContent();
+        return new ReplyTextBuilder().build(content, wxMessage, weixinService);
+    }
+
+    /**
+     * 检查当前注册会话是否处于开启状态
+     * 是则由注册会话处理消息内容，否则返回null
+     */
+    private WxMpXmlOutMessage
+    handleRegisterSessionMsg(WxMpXmlMessage wxMessage, WxMpService weixinService) {
         String wxId   = wxMessage.getToUser();
         String openid = wxMessage.getFromUser();
+        String text   = wxMessage.getContent();
 
-        if (!wxMessage.getMsgType().equals(XmlMsgType.EVENT)) {
-            //TODO 可以选择将消息保存到本地
-        }
-
-        //当用户输入关键词如“你好”，“客服”等，并且有客服在线时，把消息转发给在线客服
-        try {
-            if (StringUtils.startsWithAny(wxMessage.getContent(), "你好", "客服")
-                    && weixinService.getKefuService().kfOnlineList()
-                    .getKfOnlineList().size() > 0) {
-                return WxMpXmlOutMessage.TRANSFER_CUSTOMER_SERVICE()
-                        .fromUser(wxMessage.getToUser())
-                        .toUser(wxMessage.getFromUser()).build();
-            }
-        } catch (WxErrorException e) {
-            e.printStackTrace();
-        }
-
-        String text = wxMessage.getContent();
-
-        // 检查当前注册会话是否处于开启状态，是则由注册会话处理消息内容
         if (ibUserRegistService.isSessionActive(wxId, openid)) {
             int step = ibUserRegistService.getStep(wxId, openid);
             // step == 1，已开启注册会话，则进行手机号接收
@@ -74,12 +73,7 @@ public class MsgTextHandler extends AbstractHandler {
                 }
             }
         }
-
-        // TODO 其它的会话过程检查，存在则交给这些会话处理消息内容
-
-        //TODO 最后，如果没有开启的会话，则统一回复消息
-        String content = "收到文本消息：" + text;
-        return new ReplyTextBuilder().build(content, wxMessage, weixinService);
+        return null;
     }
 
 }

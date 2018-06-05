@@ -4,10 +4,12 @@ import com.micropace.ramp.base.common.BaseController;
 import com.micropace.ramp.base.common.ErrorMsg;
 import com.micropace.ramp.base.common.ResponseMsg;
 import com.micropace.ramp.base.entity.BUser;
+import com.micropace.ramp.base.entity.BUserBindQrcode;
 import com.micropace.ramp.base.entity.Qrcode;
 import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.base.enums.QrCodeTypeEnum;
+import com.micropace.ramp.core.service.IBUserBindQrcodeService;
 import com.micropace.ramp.core.service.IBUserService;
 import com.micropace.ramp.core.service.IQrcodeService;
 import com.micropace.ramp.core.service.IWxAppService;
@@ -36,10 +38,13 @@ public class ManageBUserController extends BaseController {
     private IBUserService iBuserService;
     @Autowired
     private IQrcodeService iQrcodeService;
+    @Autowired
+    private IBUserBindQrcodeService bindQrcodeService;
 
     /**
      * Admin审核B用户的注册申请
      * 审核通过：为B用户分配一个永久二维码并绑定
+     * TODO 托管多C公众号的情况下，审核的时候需要知道B用户申请的是哪个C公众号。
      *
      * @param id       B用户ID
      * @param isPassed 是否通过审核 1 通过，0 不通过
@@ -71,25 +76,45 @@ public class ManageBUserController extends BaseController {
             }
         } else {
             // 获取一个未被绑定的永久二维码
+
+            // TODO 这里有点问题，需要指定是C公众号的二维码，创建的时候也需要指定C公众号。
+
             Qrcode qrcode = iQrcodeService.selectIdleOneByType(bUser.getIdWxApp(), QrCodeTypeEnum.PERMANENT.getCode());
             if (qrcode == null) {
+                // 尝试生成永久二维码
+                String sceneStr = bUser.getMobile() + System.currentTimeMillis();
+                WxApp wxApp = iWxAppService.selectById(bUser.getIdWxApp());
+                if(wxApp != null) {
+                    Map<String, String> result = iQrcodeService.create(wxApp, sceneStr, true);
+                    if(result != null) {
+                        qrcode = iQrcodeService.selectBySceneStr(wxApp, sceneStr);
+                    }
+                }
+            }
+            if(qrcode == null) {
                 return error(ErrorMsg.NO_AVAILABLE_QRCODE);
             }
             // 绑定二维码
-            bUser.setIdQrcode(qrcode.getId());
-            bUser.setBindAt(sf.format(new Date()));
             bUser.setStatus(RegisterStatusEnum.SUCCESSED.getCode());
             if (iBuserService.updateById(bUser)) {
 
-                qrcode.setIsBind(1);
-                iQrcodeService.updateById(qrcode);
-                Map<String, String> result = new HashMap<>();
-                result.put("openid", bUser.getOpenid());
-                result.put("filename", qrcode.getFilename());
-                result.put("sceneStr", qrcode.getSceneStr());
-                result.put("url", qrcode.getWxurl());
-                result.put("path", "/qrcode/" + qrcode.getFilename());
-                return success(result);
+                // 创建绑定记录
+                BUserBindQrcode bindQrcode = new BUserBindQrcode();
+                bindQrcode.setIdBuser(bUser.getId());
+                bindQrcode.setIdQrcode(qrcode.getId());
+                if(bindQrcodeService.insert(bindQrcode)) {
+
+                    // 更新二维码绑定状态
+                    qrcode.setIsBind(1);
+                    iQrcodeService.updateById(qrcode);
+                    Map<String, String> result = new HashMap<>();
+                    result.put("openid", bUser.getOpenid());
+                    result.put("filename", qrcode.getFilename());
+                    result.put("sceneStr", qrcode.getSceneStr());
+                    result.put("url", qrcode.getWxurl());
+                    result.put("path", "/qrcode/" + qrcode.getFilename());
+                    return success(result);
+                }
             }
         }
 
