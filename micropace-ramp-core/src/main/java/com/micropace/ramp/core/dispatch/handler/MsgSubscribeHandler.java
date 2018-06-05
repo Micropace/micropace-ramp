@@ -1,9 +1,9 @@
 package com.micropace.ramp.core.dispatch.handler;
 
+import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.base.enums.WxAppCategoryEnum;
 import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
 import com.micropace.ramp.base.entity.*;
-import com.micropace.ramp.base.enums.RegisterStatusEnum;
 import com.micropace.ramp.core.service.*;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -121,7 +121,7 @@ public class MsgSubscribeHandler extends AbstractHandler {
                                 logger.info("Active C user: {}", userWxInfo.getNickname());
                             }
                         }
-                        reply = this.bindUser2Lord(wxApp, cUser, wxMessage, weixinService);
+                        reply = this.bindC2B(wxApp, cUser, wxMessage, weixinService);
                     }
                 }
             } catch (Exception e) {
@@ -138,7 +138,7 @@ public class MsgSubscribeHandler extends AbstractHandler {
      * 1、只处理C公众号的二维码
      * 2、这里的EventKey是带前缀的"qrscene_"
      */
-    private WxMpXmlOutMessage bindUser2Lord(WxApp wxApp, CUser fans, WxMpXmlMessage wxMessage, WxMpService weixinService) throws Exception {
+    private WxMpXmlOutMessage bindC2B(WxApp wxApp, CUser fans, WxMpXmlMessage wxMessage, WxMpService weixinService) throws Exception {
         WxMpXmlOutMessage reply = null;
 
         String eventKey = wxMessage.getEventKey();
