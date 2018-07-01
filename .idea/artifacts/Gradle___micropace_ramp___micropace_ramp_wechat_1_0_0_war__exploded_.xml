@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/micropace-ramp-wechat/build/libs/exploded/micropace-ramp-wechat-1.0.0.war</output-path>
     <properties id="gradle-properties">
       <options external-project-path="$PROJECT_DIR$">
-        <manifest>TWFuaWZlc3QtVmVyc2lvbjogMS4wDQoNCg==</manifest>
+        <manifest>TWFuaWZlc3QtVmVyc2lvbjogMS4wDQpNYWluLUNsYXNzOiBjb20ubWljcm9wYWNlLnJhbXAud2VjaGF0LlJhbXBXZWJBcHBsaWNhdGlvbg0KDQo=</manifest>
       </options>
     </properties>
     <root id="root">

@@ -56,6 +56,14 @@ public class MsgSubscribeHandler extends AbstractHandler {
             return reply;
         }
 
+
+        // 物流公众号关注回复
+        // =====================
+        if(wxMessage.getToUser().equals("gh_c1fa7b2721b5")) {
+            return new ReplyTextBuilder().build("终于等到你啦！欢迎关注《中国物流与采购》杂志微信公众号。", wxMessage, weixinService);
+        }
+        // =====================
+
         // TODO 通用关注回复消息
         try {
             return new ReplyTextBuilder().build("感谢关注", wxMessage, weixinService);

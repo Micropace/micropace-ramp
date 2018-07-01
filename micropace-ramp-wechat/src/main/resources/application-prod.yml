@@ -20,13 +20,12 @@ spring:
     password: Ramp2018
 
 server:
-  address: 47.104.139.165
-  domain: 47.104.139.165
+  address: 127.0.0.1
 
 mybatis-plus:
   global-config:
     #mapper文件热部署
-    refresh-mapper: false
+    refresh-mapper: true
 
 # 阿里云短信
 aliyun-sms:

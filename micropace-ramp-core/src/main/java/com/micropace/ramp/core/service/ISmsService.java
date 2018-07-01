@@ -34,6 +34,10 @@ public interface ISmsService {
     SendSmsResponse
     sendValidateCode(String target, String validateCode);
 
+
+    SendSmsResponse
+    sendClpSignInMessage(String target, String name, Long code);
+
     /**
      * 查询指定目标手机号的发送历史记录
      *

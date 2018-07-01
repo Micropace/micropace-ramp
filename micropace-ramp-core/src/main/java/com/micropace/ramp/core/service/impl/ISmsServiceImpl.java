@@ -63,6 +63,18 @@ public class ISmsServiceImpl implements ISmsService {
     }
 
     @Override
+    public SendSmsResponse sendClpSignInMessage(String target, String name, Long code) {
+        Map<String, String> param = new HashMap<>();
+        param.put("name", name);
+        param.put("code", code.toString());
+        return this.send(
+                target,
+                SmsTemplateTypeEnum.SMS_TEMPLATE_CLP.getDesc(),
+                SmsTemplateTypeEnum.SMS_TEMPLATE_CLP.getCode(),
+                param);
+    }
+
+    @Override
     public QuerySendDetailsResponse query(String target, String day, Long pageSize, Long currentPage) {
         //可自助调整超时时间
         System.setProperty("sun.net.client.defaultConnectTimeout", "10000");

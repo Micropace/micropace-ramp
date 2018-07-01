@@ -12,16 +12,18 @@ spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/ramp?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
     username: ramp
-    password: Ramp3r^u
+#    password: Ramp3r^u
+    password: Ramp2018
   redis:
     database: 0
     host: 127.0.0.1
     port: 6379
-    password: admin
+#    password: admin
+    password: Ramp2018
 
 server:
-  address: 127.0.0.1
-  domain: a336a7bf.ngrok.io
+#  address: 127.0.0.1
+  address: 47.104.139.165
 
 mybatis-plus:
   global-config:

@@ -131,3 +131,38 @@ create table `relation` (
   `updated_at` datetime NULL,
   PRIMARY KEY (`id`)
 ) engine=InnoDB auto_increment=1 default charset=utf8;
+
+# 字段：关键字名、公众号标识、返回消息类型（目前暂定文本和图片）、标签（是需要的具体参数，可扩或者JSON）、增加流程相关的逻辑定义
+drop table if exists `key_word`;
+create table `key_word` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `id_wx_app` BIGINT UNSIGNED NOT NULL comment 'wx_app表关联主键, 代表该关键字属于哪个公众号',
+  `key_word` varchar(256) NOT NULL COMMENT '关键字',
+
+
+  # 待完善
+
+
+  `is_session` tinyint(2) NOT NULL DEFAULT 0 COMMENT '是否是会话关键字, 0: 否,1: 是',
+  `reply_type` tinyint(2) NOT NULL COMMENT '消息返回类型，0: 文本，1：图片，2：图文',
+  `tag` JSON NULL COMMENT '标签JSON(可扩展额外的具体参数)',
+  `created_at` datetime NULL,
+  `updated_at` datetime NULL,
+  PRIMARY KEY (`id`)
+) engine=InnoDB auto_increment=1 default charset=utf8;
+
+# 物流公众号签到人员信息表==================== 临时的
+drop table if exists `clp_signin`;
+create table `clp_signin` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL COMMENT '姓名',
+  `mobile` varchar(20) NOT NULL COMMENT '手机号',
+  `company` varchar(128) NULL COMMENT '单位',
+  `sign_in_time` datetime NULL COMMENT '最新签到时间',
+  `created_at` datetime NULL,
+  `updated_at` datetime NULL,
+  PRIMARY KEY (`id`)
+) engine=InnoDB auto_increment=1 default charset=utf8;
+insert into `clp_signin` (name, mobile, company, sign_in_time, created_at, updated_at) values('丁力', '18613860084', '测试','2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
+insert into `clp_signin` (name, mobile, company, sign_in_time, created_at, updated_at) values('王成涛', '13911716518', '北京博客空间数码科技有限公司', '2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
+

@@ -26,11 +26,16 @@ jar {
     baseName = "micropace-ramp-wechat"
     manifest{
         attributes 'Manifest-Version': '1.0'
+        attributes 'Main-Class': 'com.micropace.ramp.wechat.RampApplication'
     }
 }
 
 war {
     baseName = "micropace-ramp-wechat"
+    manifest{
+        attributes 'Manifest-Version': '1.0'
+        attributes 'Main-Class': 'com.micropace.ramp.wechat.RampWebApplication'
+    }
 }
 
 repositories {

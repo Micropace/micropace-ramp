@@ -18,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +37,9 @@ public class WechatController extends BaseController {
 
     @Autowired
     private MsgDispatchManager msgDispatchManager;
+
+    @Value("${server.address}")
+    private String serverAddress;
 
     /**
      * 微信服务器认证, url中需自带wxId字段，该字段是公众号的原始ID
@@ -152,7 +156,9 @@ public class WechatController extends BaseController {
             WxMpService wxMpService = msgDispatchManager.getMpService(wxId);
             if (wxMpService != null) {
                 String resUrl      = request.getRequestURL().toString();
-                String callbackUrl = resUrl.substring(0, resUrl.lastIndexOf("/")) + "/callback";
+//                String callbackUrl = resUrl.substring(0, resUrl.lastIndexOf("/")) + "/callback";
+                String callbackUrl = String.format("http://%s/api/service/oauth/callback", serverAddress);
+                logger.info(callbackUrl);
                 String redirectUrl = wxMpService.oauth2buildAuthorizationUrl(callbackUrl, WxConsts.OAuth2Scope.SNSAPI_USERINFO, wxId);
                 try {
                     response.sendRedirect(redirectUrl);
