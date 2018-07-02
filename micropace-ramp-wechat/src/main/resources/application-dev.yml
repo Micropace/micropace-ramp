@@ -6,7 +6,8 @@ logging:
 
 # 文件上传路径
 upload:
-  path: /Users/suffrajert/Desktop/ramp/uploader/
+#  path: /Users/suffrajert/Desktop/ramp/uploader/
+  path: /home/ramp/uploader/
 
 spring:
   datasource:

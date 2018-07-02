@@ -60,7 +60,8 @@ public class MsgSubscribeHandler extends AbstractHandler {
         // 物流公众号关注回复
         // =====================
         if(wxMessage.getToUser().equals("gh_c1fa7b2721b5")) {
-            return new ReplyTextBuilder().build("终于等到你啦！欢迎关注《中国物流与采购》杂志微信公众号。", wxMessage, weixinService);
+            String welcome = "终于等到你啦！欢迎关注《中国物流与采购》杂志微信公众号。欢迎参加山东淄博2018中国物流企业家夏季峰会，请点击左下方“键盘”输入手机号码完成自助签到！";
+            return new ReplyTextBuilder().build(welcome, wxMessage, weixinService);
         }
         // =====================
 

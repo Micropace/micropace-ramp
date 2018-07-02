@@ -15,6 +15,7 @@ import me.chanjar.weixin.mp.api.WxMpService;
 import me.chanjar.weixin.mp.bean.material.WxMpMaterialFileBatchGetResult;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlMessage;
 import me.chanjar.weixin.mp.bean.message.WxMpXmlOutMessage;
+import me.chanjar.weixin.mp.bean.message.WxMpXmlOutNewsMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -176,6 +177,19 @@ public class MsgTextHandler extends AbstractHandler {
                     String errorMsg = "签到未成功，没有查到您的参会预约，请确认您发送的手机号码是否正确！";
                     return new ReplyTextBuilder().build(errorMsg, wxMessage, weixinService);
                 }
+            }
+            // 查询签到记录
+            else if(text.equals("签到记录") && wxMessage.getFromUser().equals("op2FjuEnM_f418pZWvPkBWgmc1fs")) {
+                WxMpXmlOutNewsMessage.Item art1 = new WxMpXmlOutNewsMessage.Item();
+                art1.setTitle("人员签到详情");
+                art1.setPicUrl("http://47.104.139.165/0.jpeg");
+                art1.setUrl("http://47.104.139.165/api/clp/signin/detail");
+                return WxMpXmlOutMessage
+                        .NEWS()
+                        .fromUser(wxMessage.getToUser())
+                        .toUser(wxMessage.getFromUser())
+                        .addArticle(art1)
+                        .build();
             } else {
                 String clpReply = "您的留言已收到，感谢对本平台的关注和大力支持\n" +
                         "如需检索物流行业信息，请点击菜单栏↓↓↓里的“号内搜”，输入关键词获取。\n" +

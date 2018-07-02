@@ -12,7 +12,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum SmsTemplateTypeEnum {
     SMS_TEMPLATE_LOVESELF(0, "SMS_134520038", "爱自己"),
-    SMS_TEMPLATE_CLP(1, "SMS_138071951", "爱自己");
+    SMS_TEMPLATE_CLP(1, "SMS_138068506", "爱自己");
 
     private int index;
     private String code;

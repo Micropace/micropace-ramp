@@ -18,6 +18,8 @@ public class ClpSignin extends MyBatisSuperEntity<ClpSignin> {
     private String mobile;
     @TableField("company")
     private String company;
+    @TableField("duty")
+    private String duty;
     @TableField("sign_in_time")
     private String signInTime;
 }

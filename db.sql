@@ -158,11 +158,14 @@ create table `clp_signin` (
   `name` varchar(50) NOT NULL COMMENT '姓名',
   `mobile` varchar(20) NOT NULL COMMENT '手机号',
   `company` varchar(128) NULL COMMENT '单位',
+  `duty` varchar(50) NULL COMMENT '职务',
   `sign_in_time` datetime NULL COMMENT '最新签到时间',
   `created_at` datetime NULL,
   `updated_at` datetime NULL,
   PRIMARY KEY (`id`)
 ) engine=InnoDB auto_increment=1 default charset=utf8;
-insert into `clp_signin` (name, mobile, company, sign_in_time, created_at, updated_at) values('丁力', '18613860084', '测试','2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
-insert into `clp_signin` (name, mobile, company, sign_in_time, created_at, updated_at) values('王成涛', '13911716518', '北京博客空间数码科技有限公司', '2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
+insert into `clp_signin` (name, mobile, company, duty, sign_in_time, created_at, updated_at)
+values('丁力', '18613860084', '测试', '', '2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
+insert into `clp_signin` (name, mobile, company, duty, sign_in_time, created_at, updated_at)
+values('王成涛', '13911716518', '北京博客空间数码科技有限公司', '', '2018-06-27 22:00:00', '2018-06-27 22:00:00', '2018-06-27 22:00:00');
 
