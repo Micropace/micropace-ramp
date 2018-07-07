@@ -6,25 +6,25 @@ logging:
 
 # 文件上传路径
 upload:
-#  path: /Users/suffrajert/Desktop/ramp/uploader/
-  path: /home/ramp/uploader/
+  path: /Users/suffrajert/Desktop/ramp/uploader/
+#  path: /home/ramp/uploader/
 
 spring:
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/ramp?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true&serverTimezone=GMT%2B8
     username: ramp
-#    password: Ramp3r^u
-    password: Ramp2018
+    password: Ramp3r^u
+#    password: Ramp2018
   redis:
     database: 0
     host: 127.0.0.1
     port: 6379
-#    password: admin
-    password: Ramp2018
+    password: admin
+#    password: Ramp2018
 
 server:
-#  address: 127.0.0.1
-  address: 47.104.139.165
+  address: 127.0.0.1
+#  address: 47.104.139.165
 
 mybatis-plus:
   global-config:

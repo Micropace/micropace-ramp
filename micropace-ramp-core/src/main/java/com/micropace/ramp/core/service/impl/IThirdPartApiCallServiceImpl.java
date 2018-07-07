@@ -36,7 +36,7 @@ public class IThirdPartApiCallServiceImpl implements IThirdPartApiCallService {
         try {
             String data = this.executeHttpRequest(httpget);
             QueryLoveselfQrcodeResp resp = mapper.readValue(data, QueryLoveselfQrcodeResp.class);
-            if (resp != null) {
+            if (resp != null && resp.getData() != null) {
                 qrcodeUrl = LOVESELF_HOST + resp.getData().getName();
             }
         } catch (Exception e) {
@@ -62,7 +62,7 @@ public class IThirdPartApiCallServiceImpl implements IThirdPartApiCallService {
 
             String data = this.executeHttpRequest(httppost);
             QueryLoveselfQrcodeResp resp = mapper.readValue(data, QueryLoveselfQrcodeResp.class);
-            if(null != resp) {
+            if(resp != null && resp.getData() != null) {
                 qrcodeUrl = LOVESELF_HOST + resp.getData().getName();
             }
         } catch (Exception e) {

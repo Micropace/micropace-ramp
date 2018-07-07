@@ -1,13 +1,13 @@
 package com.micropace.ramp.core.dispatch.handler;
 
 import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
+import com.micropace.ramp.base.entity.BUser;
 import com.micropace.ramp.base.entity.ClpSignin;
+import com.micropace.ramp.base.entity.WxApp;
 import com.micropace.ramp.base.util.ValidatorUtil;
 import com.micropace.ramp.core.dispatch.builder.ReplyImageBuilder;
 import com.micropace.ramp.core.dispatch.builder.ReplyTextBuilder;
-import com.micropace.ramp.core.service.IBUserRegistService;
-import com.micropace.ramp.core.service.IClpSigninService;
-import com.micropace.ramp.core.service.ISmsService;
+import com.micropace.ramp.core.service.*;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.common.session.WxSessionManager;
@@ -28,7 +28,13 @@ import java.util.Map;
 public class MsgTextHandler extends AbstractHandler {
 
     @Autowired
+    private IWxAppService iWxAppService;
+    @Autowired
+    private IBUserService ibUserService;
+    @Autowired
     private IBUserRegistService ibUserRegistService;
+    @Autowired
+    private IThirdPartApiCallService iThirdPartApiCallService;
 
     @Autowired
     private ISmsService iSmsService;
@@ -46,20 +52,20 @@ public class MsgTextHandler extends AbstractHandler {
             return reply;
         }
 
-        // TODO 其它的会话过程检查，存在则交给这些会话处理消息内容
-
         // 这里处理小程序二维码获取的关键字
-        reply = this.handleLoveselfQrcodeQuery(wxMessage, weixinService);
+        reply = this.handleLoveselfQrcodeQueryMsg(wxMessage, weixinService);
         if(reply != null) {
             return reply;
         }
+
+        // TODO 其它的会话过程检查，存在则交给这些会话处理消息内容
+
 
         // 这里处理物流公众号的签到关键字
         reply = this.handleClpSigninMessage(wxMessage, weixinService);
         if(reply != null) {
             return reply;
         }
-
 
         //TODO 最后，如果没有开启的会话，则统一回复消息
         String content = "收到文本消息：" + wxMessage.getContent();
@@ -106,46 +112,53 @@ public class MsgTextHandler extends AbstractHandler {
 
     // 这里处理小程序二维码获取的关键字
     private WxMpXmlOutMessage
-    handleLoveselfQrcodeQuery(WxMpXmlMessage wxMessage, WxMpService weixinService) {
+    handleLoveselfQrcodeQueryMsg(WxMpXmlMessage wxMessage, WxMpService weixinService) {
         String wxId   = wxMessage.getToUser();
         String openid = wxMessage.getFromUser();
         String text   = wxMessage.getContent();
 
         // 放在无量聚公众号里处理
         if(wxId.equals("gh_54d94f90fc35")) {
-
-            // 获取上传的二维码图片素材列表
-            List<WxMpMaterialFileBatchGetResult.WxMaterialFileBatchGetNewsItem> mediaItems = null;
-            try {
-                WxMpMaterialFileBatchGetResult picMedia = weixinService.getMaterialService()
-                        .materialFileBatchGet(WxConsts.MediaFileType.IMAGE, 0, 20);
-                mediaItems = picMedia.getItems();
-            } catch (WxErrorException e) {
-                e.printStackTrace();
+            WxApp wxApp = iWxAppService.selectByWxOriginId(wxId);
+            BUser bUser = ibUserService.selectByOpenid(wxApp.getId(), openid);
+            if(bUser == null || bUser.getMobile() == null) {
+                String reply = "请注册后重试";
+                return new ReplyTextBuilder().build(reply, wxMessage, weixinService);
             }
 
-            if(mediaItems != null && mediaItems.size() > 0) {
-                String scene = null;
-                // mediaId = p4M33l5e65nhHj40G2GyezI_IgCTH3T9EbTNLEoLGhA
-                if (text.equals("超级科室会1")) scene = "10001";
-                // mediaId = CDATA[p4M33l5e65nhHj40G2Gye59uAW895vyVi9mjk8W5t4A
-                if (text.equals("超级科室会2")) scene = "10002";
-                // mediaId = CDATA[p4M33l5e65nhHj40G2Gye3xi3KT0yDysWn8GT-_2pgA
-                if (text.equals("超级拜访")) scene = "10003";
+            // 使用B公众号用户注册的手机号 TODO 这里关键字和题ID的对应需要一个表去维护
+            String mobile = bUser.getMobile();
+            String loveselfScene = null;
+            if (text.equals("超级科室会1")) {
+                loveselfScene = mobile + 1;
+            }
+            if (text.equals("超级科室会2")) {
+                loveselfScene = mobile + 2;
+            }
+            if (text.equals("超级拜访")) {
+                loveselfScene = mobile + 3;
+            }
+            System.out.println(loveselfScene);
+            String qrcodeUrl = iThirdPartApiCallService.getLoveselfQrcodePic(loveselfScene);
+            if(qrcodeUrl == null) {
+                qrcodeUrl = iThirdPartApiCallService.createLoveselfQrcode(loveselfScene);
+            }
 
-                String mediaId = this.getQrcodeMediaId(mediaItems, scene);
-                if(scene != null && mediaId != null) {
-                    return new ReplyImageBuilder().build(mediaId, wxMessage, weixinService);
-                }
+            // 再次判断是否创建成功
+            if(qrcodeUrl == null) {
+                return new ReplyTextBuilder().build("您不是代表, 无法获取答题小程序二维码", wxMessage, weixinService);
             }
-        }
-        return null;
-    }
-    private String getQrcodeMediaId(List<WxMpMaterialFileBatchGetResult.WxMaterialFileBatchGetNewsItem> mediaItems, String scene) {
-        for (WxMpMaterialFileBatchGetResult.WxMaterialFileBatchGetNewsItem mediaItem : mediaItems) {
-            if(mediaItem.getName().equals(scene + ".jpg")) {
-                return mediaItem.getMediaId();
-            }
+
+            WxMpXmlOutNewsMessage.Item art1 = new WxMpXmlOutNewsMessage.Item();
+            art1.setTitle("答题二维码");
+            art1.setPicUrl(qrcodeUrl);
+            art1.setUrl(qrcodeUrl);
+            return WxMpXmlOutMessage
+                    .NEWS()
+                    .fromUser(wxMessage.getToUser())
+                    .toUser(wxMessage.getFromUser())
+                    .addArticle(art1)
+                    .build();
         }
         return null;
     }

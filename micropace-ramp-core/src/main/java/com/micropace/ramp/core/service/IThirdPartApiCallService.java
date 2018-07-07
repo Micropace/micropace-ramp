@@ -7,7 +7,8 @@ package com.micropace.ramp.core.service;
  */
 public interface IThirdPartApiCallService {
 
-    String LOVESELF_HOST = "https://micropace.top/";
+//    String LOVESELF_HOST = "https://micropace.top/";
+    String LOVESELF_HOST = "http://localhost:8089/";
 
     /**
      * 获取爱自己小程序的题目二维码
