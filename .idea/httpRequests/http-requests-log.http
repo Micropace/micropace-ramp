@@ -1,0 +1,22 @@
+GET http://localhost:9980/api/admin/lord/check?id=2&isPassed=1
+Accept: */*
+Cache-Control: no-cache
+
+<> 2018-06-02T112338.200.json
+
+###
+
+GET http://localhost:9980/api/admin/lord?id=2&isPassed=1
+Accept: */*
+Cache-Control: no-cache
+
+<> 2018-06-02T112326.404.json
+
+###
+
+GET http://localhost:8080/api/admin/lord?id=2&isPassed=1
+Accept: */*
+Cache-Control: no-cache
+
+###
+

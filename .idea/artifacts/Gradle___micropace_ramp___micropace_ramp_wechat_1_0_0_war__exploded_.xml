@@ -29,7 +29,6 @@
           </element>
           <element id="library" level="project" name="Gradle: com.baomidou:mybatis-plus-boot-starter:2.2.0" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-starter:1.5.10.RELEASE" />
-          <element id="library" level="project" name="Gradle: org.projectlombok:lombok:1.16.20" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-autoconfigure:1.5.10.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot:1.5.10.RELEASE" />
           <element id="library" level="project" name="Gradle: org.springframework.boot:spring-boot-starter-logging:1.5.10.RELEASE" />
@@ -107,6 +106,7 @@
           <element id="library" level="project" name="Gradle: com.fasterxml.jackson.core:jackson-annotations:2.8.0" />
           <element id="library" level="project" name="Gradle: org.apache.tomcat:tomcat-jdbc:8.5.27" />
           <element id="library" level="project" name="Gradle: org.apache.httpcomponents:httpcore:4.4.9" />
+          <element id="library" level="project" name="Gradle: org.projectlombok:lombok:1.16.20" />
           <element id="library" level="project" name="Gradle: com.fasterxml.jackson.core:jackson-core:2.8.10" />
           <element id="library" level="project" name="Gradle: net.minidev:json-smart:2.2.1" />
           <element id="library" level="project" name="Gradle: org.objenesis:objenesis:2.1" />

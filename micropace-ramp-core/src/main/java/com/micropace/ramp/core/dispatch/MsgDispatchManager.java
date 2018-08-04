@@ -194,6 +194,12 @@ public class MsgDispatchManager {
             return;
         }
 
+        WxTypeEnum wxTypeEnum = WxTypeEnum.getByCode(wxApp.getWxType());
+        if(wxTypeEnum == null) {
+            logger.error("不支持的微信公众号类型");
+            return;
+        }
+
         WxMpInMemoryConfigStorage configStorage = new WxMpInMemoryConfigStorage();
         configStorage.setAppId(wxApp.getAppId());
         configStorage.setSecret(wxApp.getSecret());
@@ -203,20 +209,20 @@ public class MsgDispatchManager {
         WxMpService wxMpService = new me.chanjar.weixin.mp.api.impl.WxMpServiceImpl();
         wxMpService.setWxMpConfigStorage(configStorage);
         if (this.wxMpAppServices.containsKey(wxApp.getWxId())) {
-            logger.info("refresh wxapp {} message service", wxApp.getWxId());
+            logger.info("更新微信{} {} 消息处理服务", wxTypeEnum.getDesc(), wxApp.getWxId());
             this.wxMpAppServices.replace(wxApp.getWxId(), wxMpService);
         } else {
-            logger.info("init wxapp {} message service", wxApp.getWxId());
+            logger.info("创建微信{} {} 消息处理服务", wxTypeEnum.getDesc(), wxApp.getWxId());
             this.wxMpAppServices.put(wxApp.getWxId(), wxMpService);
         }
 
         WxMpMessageRouter router = this.getMpMsgRouter(wxMpService);
         if (router != null) {
             if (this.wxMpAppRouters.containsKey(wxApp.getWxId())) {
-                logger.debug("refresh wxapp {} message router", wxApp.getWxId());
+                logger.info("更新微信{} {} 消息路由", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxMpAppRouters.replace(wxApp.getWxId(), router);
             } else {
-                logger.debug("init wxapp {} message router", wxApp.getWxId());
+                logger.info("创建微信{} {} 消息路由", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxMpAppRouters.put(wxApp.getWxId(), router);
             }
         }
@@ -224,23 +230,28 @@ public class MsgDispatchManager {
 
     /** 初始化企业号的服务 */
     private void initCpService(WxApp wxApp) {
+        WxTypeEnum wxTypeEnum = WxTypeEnum.getByCode(wxApp.getWxType());
+        if(wxTypeEnum == null) {
+            logger.error("不支持的微信公众号类型");
+            return;
+        }
         WxCpService wxMpService = this.getCpMsgService(this.getCpMsgConfigStorage(wxApp));
         if (wxMpService != null) {
             if (this.wxCpAppServices.containsKey(wxApp.getWxId())) {
-                logger.info("refresh wxapp {} message service", wxApp.getWxId());
+                logger.info("更新微信{} {} 消息处理服务", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxCpAppServices.replace(wxApp.getWxId(), wxMpService);
             } else {
-                logger.info("init wxapp {} message service", wxApp.getWxId());
+                logger.info("创建微信{} {} 消息处理服务", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxCpAppServices.put(wxApp.getWxId(), wxMpService);
             }
         }
         WxCpMessageRouter router = this.getCpMsgRouter(wxMpService);
         if (router != null) {
             if (this.wxCpAppRouters.containsKey(wxApp.getWxId())) {
-                logger.debug("refresh wxapp {} message router", wxApp.getWxId());
+                logger.info("更新微信{} {} 消息路由", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxCpAppRouters.replace(wxApp.getWxId(), router);
             } else {
-                logger.debug("init wxapp {} message router", wxApp.getWxId());
+                logger.info("创建微信{} {} 消息路由", wxTypeEnum.getDesc(), wxApp.getWxId());
                 this.wxCpAppRouters.put(wxApp.getWxId(), router);
             }
         }
